@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
     res.json({
-        mensaje: 'Api de proyecto PRE(backend)'
+        mensaje: 'Api de proyecto PRE(backend), ya funciona tu server joven'
     })
 });
 
