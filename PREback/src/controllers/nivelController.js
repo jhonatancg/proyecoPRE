@@ -4,7 +4,7 @@ const crearNivel = async (req, res) => {
     try {
         const { nombre } = req.body;
 
-        if (!nombre || nombre.trim() === "") {
+        if (!nombre?.trim()) {
             return res.status(400).json({
                 success: false,
                 mensaje: 'El nombre es obligatorio',
@@ -69,7 +69,7 @@ const modificarNivel = async (req, res) => {
         const { id } = req.params;
         const { nombre } = req.body;
 
-        if (!nombre || nombre.trim() === "") {
+        if (!nombre?.trim()) {
             return res.status(400).json({
                 success: false,
                 mensaje: 'El nombre es obligatorio para modificar'
@@ -130,15 +130,6 @@ const eliminarNivel = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 mensaje: "Nivel no encontrado"
-            });
-        }
-
-        const [conteoAlumnos] = await db.query('SELECT COUNT(*) as total FROM alumnos WHERE nivel_id = ?', [id]);
-
-        if (conteoAlumnos[0].total > 0) {
-            return res.status(400).json({ // Usamos 400 Bad Request
-                success: false,
-                mensaje: "No se puede eliminar el nivel porque tiene alumnos inscritos."
             });
         }
 

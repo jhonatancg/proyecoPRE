@@ -6,6 +6,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
 const nivelRoutes = require('./routes/nivelRoutes');
+const usuarioRoutes = require('./routes/usuarioRoutes');
+const alumnoRoutes = require('./routes/alumnoRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/niveles', nivelRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/alumnos', alumnoRoutes);
 
 app.get('/', (req, res) => {
     res.json({
