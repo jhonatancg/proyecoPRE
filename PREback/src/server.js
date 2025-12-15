@@ -8,6 +8,9 @@ const swaggerSpec = require('./config/swagger');
 const nivelRoutes = require('./routes/nivelRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const alumnoRoutes = require('./routes/alumnoRoutes');
+const cursoRoutes = require('./routes/cursoRoutes');
+const seccionRoutes = require('./routes/seccionRoutes');
+const periodoRoutes = require('./routes/periodoRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +23,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/niveles', nivelRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/alumnos', alumnoRoutes);
+app.use('/api/cursos', cursoRoutes);
+app.use('/api/secciones', seccionRoutes);
+app.use('/api/periodos', periodoRoutes);
 
 app.get('/', (req, res) => {
     res.json({

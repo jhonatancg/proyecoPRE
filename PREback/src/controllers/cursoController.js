@@ -1,6 +1,6 @@
 const db = require('../config/database');
 
-const crearNivel = async (req, res) => {
+const crearCurso = async (req, res) => {
     try {
         const { nombre } = req.body;
 
@@ -12,59 +12,59 @@ const crearNivel = async (req, res) => {
         }
 
         const [existe] = await db.query(
-            'SELECT id FROM niveles WHERE nombre = ? AND estado = 1',
+            'SELECT id FROM cursos WHERE nombre = ? AND estado = 1',
             [nombre]
         );
 
         if (existe.length > 0) {
             return res.status(400).json({
                 success: false,
-                mensaje: "Ya existe un nivel con ese nombre"
+                mensaje: "Ya existe este curso con ese nombre"
             });
         }
 
         const [resultado] = await db.query(
-            'INSERT INTO niveles(nombre) VALUES (?)',
+            'INSERT INTO cursos(nombre) VALUES (?)',
             [nombre]
         );
 
         res.status(201).json({
             success: true,
-            mensaje: "Nivel creado exitosamente",
+            mensaje: "Curso creado exitosamente",
             data: {
                 id: resultado.insertId,
                 nombre
             }
         })
     } catch (error) {
-        console.error('Error al crear el nivel');
+        console.error('Error al crear el curso');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al crear el nivel',
+            mensaje: 'Error al crear el curso',
             error: error.message
         })
     }
 };
 
-const obtenerNiveles = async (req, res) => {
+const obtenerCursos = async (req, res) => {
     try {
-        const [niveles] = await db.query('SELECT * FROM niveles WHERE estado = 1 ORDER BY id DESC');
+        const [cursos] = await db.query('SELECT * FROM cursos WHERE estado = 1 ORDER BY id DESC');
         res.json({
             success: true,
-            count: niveles.length,
-            data: niveles
+            count: cursos.length,
+            data: cursos
         })
     } catch (error) {
-        console.error('Error al obtener niveles');
+        console.error('Error al obtener cursos');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al obtener niveles',
+            mensaje: 'Error al obtener cursos',
             error: error.message
         })
     }
 };
 
-const modificarNivel = async (req, res) => {
+const modificarCurso = async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre } = req.body;
@@ -76,86 +76,86 @@ const modificarNivel = async (req, res) => {
             });
         }
 
-        const [nivelExistente] = await db.query('SELECT id FROM niveles WHERE id=?', [id]);
+        const [cursoExistente] = await db.query('SELECT id FROM cursos WHERE id=?', [id]);
 
-        if (nivelExistente.length === 0) {
+        if (cursoExistente.length === 0) {
             return res.status(404).json({
                 success: false,
-                mensaje: "Nivel no encontrado"
+                mensaje: "Curso no encontrado"
             });
         }
 
         const [duplicado] = await db.query(
-            'SELECT id FROM niveles WHERE nombre = ? AND id != ? AND estado = 1',
+            'SELECT id FROM cursos WHERE nombre = ? AND id != ? AND estado = 1',
             [nombre, id]
         );
 
         if (duplicado.length > 0) {
             return res.status(400).json({
                 success: false,
-                mensaje: "Ya existe otro nivel con ese nombre"
+                mensaje: "Ya existe otro curso con ese nombre"
             });
         }
 
         await db.query(
-            'UPDATE niveles set nombre=? WHERE id=?',
+            'UPDATE cursos set nombre=? WHERE id=?',
             [nombre, id]
         );
 
         res.status(200).json({
             success: true,
-            mensaje: "Nivel modificado exitosamente",
+            mensaje: "Curso modificado exitosamente",
             data: {
                 id,
                 nombre
             }
         })
     } catch (error) {
-        console.error('Error al modificar el nivel');
+        console.error('Error al modificar el curso');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al modificar el nivel',
+            mensaje: 'Error al modificar el curso',
             error: error.message
         })
     }
 };
 
-const eliminarNivel = async (req, res) => {
+const eliminarCurso = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [nivelExistente] = await db.query('SELECT id FROM niveles WHERE id=?', [id]);
+        const [cursoExistente] = await db.query('SELECT id FROM cursos WHERE id=?', [id]);
 
-        if (nivelExistente.length === 0) {
+        if (cursoExistente.length === 0) {
             return res.status(404).json({
                 success: false,
-                mensaje: "Nivel no encontrado"
+                mensaje: "Curso no encontrado"
             });
         }
 
         await db.query(
-            'UPDATE niveles SET estado = 0 WHERE id = ?',
+            'UPDATE cursos SET estado = 0 WHERE id = ?',
             [id]
         );
 
         res.status(200).json({
             success: true,
-            mensaje: "Nivel desactivado exitosamente (Borrado Lógico)",
+            mensaje: "Curso desactivado exitosamente (Borrado Lógico)",
 
         })
     } catch (error) {
-        console.error('Error al eliminar el nivel');
+        console.error('Error al eliminar el curso');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al eliminar el nivel',
+            mensaje: 'Error al eliminar el curso',
             error: error.message
         })
     }
 };
 
 module.exports = {
-    crearNivel,
-    obtenerNiveles,
-    modificarNivel,
-    eliminarNivel
+    crearCurso,
+    obtenerCursos,
+    modificarCurso,
+    eliminarCurso
 }

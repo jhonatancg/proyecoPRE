@@ -1,6 +1,6 @@
 const db = require('../config/database');
 
-const crearNivel = async (req, res) => {
+const crearSeccion = async (req, res) => {
     try {
         const { nombre } = req.body;
 
@@ -12,59 +12,59 @@ const crearNivel = async (req, res) => {
         }
 
         const [existe] = await db.query(
-            'SELECT id FROM niveles WHERE nombre = ? AND estado = 1',
+            'SELECT id FROM secciones WHERE nombre = ? AND estado = 1',
             [nombre]
         );
 
         if (existe.length > 0) {
             return res.status(400).json({
                 success: false,
-                mensaje: "Ya existe un nivel con ese nombre"
+                mensaje: "Ya existe una seccion con ese nombre"
             });
         }
 
         const [resultado] = await db.query(
-            'INSERT INTO niveles(nombre) VALUES (?)',
+            'INSERT INTO secciones (nombre) VALUES (?)',
             [nombre]
         );
 
         res.status(201).json({
             success: true,
-            mensaje: "Nivel creado exitosamente",
+            mensaje: "Seccion creada exitosamente",
             data: {
                 id: resultado.insertId,
                 nombre
             }
         })
     } catch (error) {
-        console.error('Error al crear el nivel');
+        console.error('Error al crear la seccion');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al crear el nivel',
+            mensaje: 'Error al crear la seccion',
             error: error.message
         })
     }
 };
 
-const obtenerNiveles = async (req, res) => {
+const obtenerSeccion = async (req, res) => {
     try {
-        const [niveles] = await db.query('SELECT * FROM niveles WHERE estado = 1 ORDER BY id DESC');
+        const [secciones] = await db.query('SELECT * FROM secciones WHERE estado = 1 ORDER BY id DESC');
         res.json({
             success: true,
-            count: niveles.length,
-            data: niveles
+            count: secciones.length,
+            data: secciones
         })
     } catch (error) {
-        console.error('Error al obtener niveles');
+        console.error('Error al obtener secciones');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al obtener niveles',
+            mensaje: 'Error al obtener secciones',
             error: error.message
         })
     }
 };
 
-const modificarNivel = async (req, res) => {
+const modificarSeccion = async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre } = req.body;
@@ -76,86 +76,86 @@ const modificarNivel = async (req, res) => {
             });
         }
 
-        const [nivelExistente] = await db.query('SELECT id FROM niveles WHERE id=?', [id]);
+        const [seccionExistente] = await db.query('SELECT id FROM secciones WHERE id=?', [id]);
 
-        if (nivelExistente.length === 0) {
+        if (seccionExistente.length === 0) {
             return res.status(404).json({
                 success: false,
-                mensaje: "Nivel no encontrado"
+                mensaje: "Seccion no encontrada"
             });
         }
 
         const [duplicado] = await db.query(
-            'SELECT id FROM niveles WHERE nombre = ? AND id != ? AND estado = 1',
+            'SELECT id FROM secciones WHERE nombre = ? AND id != ? AND estado = 1',
             [nombre, id]
         );
 
         if (duplicado.length > 0) {
             return res.status(400).json({
                 success: false,
-                mensaje: "Ya existe otro nivel con ese nombre"
+                mensaje: "Ya existe otra seccion con ese nombre"
             });
         }
 
         await db.query(
-            'UPDATE niveles set nombre=? WHERE id=?',
+            'UPDATE secciones set nombre=? WHERE id=?',
             [nombre, id]
         );
 
         res.status(200).json({
             success: true,
-            mensaje: "Nivel modificado exitosamente",
+            mensaje: "Seccion modificada exitosamente",
             data: {
                 id,
                 nombre
             }
         })
     } catch (error) {
-        console.error('Error al modificar el nivel');
+        console.error('Error al modificar la seccion');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al modificar el nivel',
+            mensaje: 'Error al modificar la seccion',
             error: error.message
         })
     }
 };
 
-const eliminarNivel = async (req, res) => {
+const eliminarSeccion = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [nivelExistente] = await db.query('SELECT id FROM niveles WHERE id=?', [id]);
+        const [seccionExistente] = await db.query('SELECT id FROM secciones WHERE id=?', [id]);
 
-        if (nivelExistente.length === 0) {
+        if (seccionExistente.length === 0) {
             return res.status(404).json({
                 success: false,
-                mensaje: "Nivel no encontrado"
+                mensaje: "Seccion no encontrada"
             });
         }
 
         await db.query(
-            'UPDATE niveles SET estado = 0 WHERE id = ?',
+            'UPDATE secciones SET estado = 0 WHERE id = ?',
             [id]
         );
 
         res.status(200).json({
             success: true,
-            mensaje: "Nivel desactivado exitosamente (Borrado Lógico)",
+            mensaje: "Seccion desactivada exitosamente (Borrado Lógico)",
 
         })
     } catch (error) {
-        console.error('Error al eliminar el nivel');
+        console.error('Error al eliminar la seccion');
         res.status(500).json({
             success: false,
-            mensaje: 'Error al eliminar el nivel',
+            mensaje: 'Error al eliminar la seccion',
             error: error.message
         })
     }
 };
 
 module.exports = {
-    crearNivel,
-    obtenerNiveles,
-    modificarNivel,
-    eliminarNivel
+    crearSeccion,
+    obtenerSeccion,
+    modificarSeccion,
+    eliminarSeccion
 }
