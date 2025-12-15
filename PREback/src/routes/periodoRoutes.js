@@ -3,10 +3,10 @@ const router = express.Router();
 
 const {
     crearPeriodo,
-    obtenerperiodos,
+    obtenerPeriodos,
     modificarPeriodo,
     eliminarPeriodo
-} = require('../controllers/periodoAcademicoController');
+} = require('../controllers/periodoController');
 
 /**
  * @swagger
@@ -17,9 +17,9 @@ const {
 
 /**
  * @swagger
- * /api/periodos:
+ * /periodos:
  *   post:
- *     summary: Crear un nuevo periodo académico
+ *     summary: Crear un periodo académico
  *     tags: [Periodos Académicos]
  *     requestBody:
  *       required: true
@@ -62,7 +62,7 @@ router.post('/', crearPeriodo);
 
 /**
  * @swagger
- * /api/periodos:
+ * /periodos:
  *   get:
  *     summary: Obtener todos los periodos académicos activos
  *     tags: [Periodos Académicos]
@@ -72,11 +72,11 @@ router.post('/', crearPeriodo);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', obtenerperiodos);
+router.get('/', obtenerPeriodos);
 
 /**
  * @swagger
- * /api/periodos/{id}:
+ * /periodos/{id}:
  *   put:
  *     summary: Modificar un periodo académico
  *     tags: [Periodos Académicos]
@@ -131,7 +131,7 @@ router.put('/:id', modificarPeriodo);
 
 /**
  * @swagger
- * /api/periodos/{id}:
+ * /periodos/{id}:
  *   delete:
  *     summary: Eliminar un periodo académico (borrado lógico)
  *     tags: [Periodos Académicos]

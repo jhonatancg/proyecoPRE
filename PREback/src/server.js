@@ -11,6 +11,14 @@ const alumnoRoutes = require('./routes/alumnoRoutes');
 const cursoRoutes = require('./routes/cursoRoutes');
 const seccionRoutes = require('./routes/seccionRoutes');
 const periodoRoutes = require('./routes/periodoRoutes');
+const matriculaRoutes = require('./routes/matriculaRoutes');
+const asistenciaRoutes = require('./routes/asistenciaRoutes');
+const usuarioRolRoutes = require('./routes/usuarioRolRoutes');
+const rolRoutes = require('./routes/rolRoutes');
+const asignacionCursoRoutes = require('./routes/asignacionCursoRoutes');
+const nivelCursoRoutes = require('./routes/nivelCursoRoutes');
+const evaluacionRoutes = require('./routes/evaluacionRoutes');
+const notasRoutes = require('./routes/notasRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +34,14 @@ app.use('/api/alumnos', alumnoRoutes);
 app.use('/api/cursos', cursoRoutes);
 app.use('/api/secciones', seccionRoutes);
 app.use('/api/periodos', periodoRoutes);
+app.use('/api/matriculas', matriculaRoutes);
+app.use('/api/asistencia', asistenciaRoutes);
+app.use('/api/usuarioRol', usuarioRolRoutes);
+app.use('/api/rol', rolRoutes);
+app.use('/api/asignacionCurso', asignacionCursoRoutes);
+app.use('/api/nivelCurso', nivelCursoRoutes);
+app.use('/api/evaluacion', evaluacionRoutes);
+app.use('/api/notas', notasRoutes);
 
 app.get('/', (req, res) => {
     res.json({
