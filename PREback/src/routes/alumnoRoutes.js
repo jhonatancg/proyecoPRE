@@ -4,6 +4,7 @@ const router = express.Router();
 const {
     crearAlumno,
     obtenerAlumnos,
+    obtenerAlumnoPorId,
     modificarAlumno,
     eliminarAlumno
 } = require('../controllers/alumnoController');
@@ -17,9 +18,9 @@ const {
 
 /**
  * @swagger
- * /alumnos:
+ * /api/alumnos:
  *   post:
- *     summary: Crear un nuevo alumno
+ *     summary: Crear un alumno
  *     tags: [Alumnos]
  *     requestBody:
  *       required: true
@@ -32,57 +33,64 @@ const {
  *               - apellidos
  *               - dni_ce
  *               - genero
+ *               - apoderado
+ *               - cel_apoderado
  *             properties:
  *               nombres:
  *                 type: string
- *                 example: Juan Carlos
+ *                 example: Juan
  *               apellidos:
  *                 type: string
- *                 example: Pérez Gómez
+ *                 example: Pérez López
  *               dni_ce:
  *                 type: string
- *                 example: 12345678
+ *                 example: 74581236
  *               genero:
  *                 type: string
  *                 example: M
+ *               celular:
+ *                 type: string
+ *                 example: 987654321
+ *               apoderado:
+ *                 type: string
+ *                 example: María López
+ *               cel_apoderado:
+ *                 type: string
+ *                 example: 999888777
  *     responses:
  *       201:
  *         description: Alumno creado exitosamente
  *       400:
- *         description: Error de validación o alumno duplicado
- *       500:
- *         description: Error interno del servidor
+ *         description: Error de validación
  */
 router.post('/', crearAlumno);
 
 /**
  * @swagger
- * /alumnos:
+ * /api/alumnos:
  *   get:
- *     summary: Obtener todos los alumnos activos
+ *     summary: Obtener lista de alumnos activos
  *     tags: [Alumnos]
  *     responses:
  *       200:
  *         description: Lista de alumnos
- *       500:
- *         description: Error interno del servidor
  */
 router.get('/', obtenerAlumnos);
+router.get('/:id', obtenerAlumnoPorId);
 
 /**
  * @swagger
- * /alumnos/{id}:
+ * /api/alumnos/{id}:
  *   put:
- *     summary: Modificar un alumno existente
+ *     summary: Modificar un alumno
  *     tags: [Alumnos]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID del alumno
  *         schema:
  *           type: integer
- *           example: 1
+ *         example: 8
  *     requestBody:
  *       required: true
  *       content:
@@ -101,41 +109,42 @@ router.get('/', obtenerAlumnos);
  *                 example: Pérez Gómez
  *               dni_ce:
  *                 type: string
- *                 description: Opcional. Solo enviar si se desea modificar
- *                 example: 87654321
+ *                 example: 74581236
+ *               celular:
+ *                 type: string
+ *                 example: 987654321
+ *               apoderado:
+ *                 type: string
+ *                 example: María Gómez
+ *               cel_apoderado:
+ *                 type: string
+ *                 example: 999888777
  *     responses:
  *       200:
  *         description: Alumno modificado exitosamente
- *       400:
- *         description: Error de validación o alumno duplicado
  *       404:
  *         description: Alumno no encontrado
- *       500:
- *         description: Error interno del servidor
  */
 router.put('/:id', modificarAlumno);
 
 /**
  * @swagger
- * /alumnos/{id}:
+ * /api/alumnos/{id}:
  *   delete:
- *     summary: Eliminar un alumno (borrado lógico)
+ *     summary: Eliminar alumno (borrado lógico)
  *     tags: [Alumnos]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID del alumno
  *         schema:
  *           type: integer
- *           example: 1
+ *         example: 8
  *     responses:
  *       200:
  *         description: Alumno desactivado exitosamente
  *       404:
  *         description: Alumno no encontrado
- *       500:
- *         description: Error interno del servidor
  */
 router.delete('/:id', eliminarAlumno);
 

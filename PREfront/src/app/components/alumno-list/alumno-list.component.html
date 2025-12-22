@@ -1,0 +1,41 @@
+<div class="main-container">
+    <div class="header-section">
+        <h2>Gestión de Alumnos</h2>
+        <a routerLink="/alumnos/nuevo" class="btn-new">Nuevo Alumno</a>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="fl-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Alumno</th>
+                    <th>DNI</th>
+                    <th>Género</th>
+                    <th>Celular</th>
+                    <th>Datos Apoderado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let alumno of alumnos">
+                    <td>{{alumno.id}}</td>
+                    <td>
+                        <strong>{{alumno.apellidos}}</strong>, {{alumno.nombres}}
+                    </td>
+                    <td>{{alumno.dni_ce}}</td>
+                    <td>{{alumno.genero}}</td>
+                    <td>{{alumno.celular || 'N/A'}}</td>
+                    <td>
+                        {{alumno.apoderado}} <br>
+                        <span class="sub-text">({{alumno.cel_apoderado}})</span>
+                    </td>
+                    <td class="actions-cell">
+                        <a [routerLink]="['/alumnos/editar', alumno.id]" class="btn-action btn-edit">Editar</a>
+                        <button (click)="eliminarAlumno(alumno.id!)" class="btn-action btn-delete">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

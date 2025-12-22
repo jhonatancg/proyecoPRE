@@ -1,0 +1,26 @@
+<p>alumno-form works!</p>
+<form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()">
+    <label>nombres</label>
+    <input type="text" formControlName="nombres">
+    <br>
+    <label>apellidos</label>
+    <input type="text" formControlName="apellidos">
+    <br>
+    <label>DNI</label>
+    <input type="text" formControlName="dni_ce">
+    <br>
+    <label>genero</label>
+    <input type="text" formControlName="genero">
+    <br>
+    <label>celular</label>
+    <input type="text" formControlName="celular">
+    <br>
+    <label>apoderado</label>
+    <input type="text" formControlName="apoderado">
+    <br>
+    <label>celular del apoderado</label>
+    <input type="text" formControlName="cel_apoderado">
+    <br>
+    <button type="submit">Guardar</button>
+    <button routerLink="/alumnos">Cancelar</button>
+</form>
