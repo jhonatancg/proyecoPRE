@@ -2,14 +2,27 @@ const db = require('../config/database');
 
 const registrarAsistencia = async (req, res) => {
     try {
-        const { alumno_id, situacion } = req.body;
+        const { dni } = req.body;
 
-        if (!alumno_id) {
+        if (!dni) {
             return res.status(400).json({
                 success: false,
-                mensaje: 'El ID del alumno es obligatorio (Lectura QR fallida)',
+                mensaje: 'Lectura inválida: No se detectó un DNI en el QR',
             });
         }
+        const [alumnoFound] = await db.query(
+            'SELECT id, nombres, apellidos FROM alumnos WHERE dni_ce = ? AND estado = 1',
+            [dni]
+        );
+        if (alumnoFound.length === 0) {
+            return res.status(404).json({
+                success: false,
+                mensaje: "Alumno no encontrado en el sistema"
+            });
+        }
+
+        const alumno = alumnoFound[0];
+        const alumno_id = alumno.id;
 
         const [existe] = await db.query(
             'SELECT id FROM asistencia WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1',
@@ -19,11 +32,15 @@ const registrarAsistencia = async (req, res) => {
         if (existe.length > 0) {
             return res.status(400).json({
                 success: false,
-                mensaje: "El alumno ya registró su asistencia el día de hoy"
+                mensaje: `El alumno ${alumno.nombres} ya registró asistencia hoy.`
             });
         }
 
-        const situacionFinal = situacion || 'Presente';
+        const ahora = new Date();
+        const horaLimite = new Date();
+        horaLimite.setHours(7, 15, 0);
+
+        const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
 
         const [resultado] = await db.query(
             'INSERT INTO asistencia (alumno_id, fecha, hora_entrada, situacion) VALUES (?, CURDATE(), CURTIME(), ?)',
@@ -32,21 +49,20 @@ const registrarAsistencia = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            mensaje: "Asistencia registrada correctamente",
+            mensaje: `Asistencia Registrada: ${situacionFinal}`,
             data: {
                 id: resultado.insertId,
-                alumno_id,
+                alumno: `${alumno.nombres} ${alumno.apellidos}`,
                 situacion: situacionFinal,
-                fecha: new Date(),
                 hora: new Date().toLocaleTimeString()
             }
         });
 
     } catch (error) {
-        console.error('Error al registrar asistencia:');
+        console.error('Error al registrar asistencia:', error);
         res.status(500).json({
             success: false,
-            mensaje: 'Error en el servidor al registrar asistencia',
+            mensaje: 'Error interno al procesar QR',
             error: error.message
         });
     }

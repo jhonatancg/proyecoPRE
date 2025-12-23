@@ -1,0 +1,47 @@
+<div class="carnet-backdrop pb-4" *ngIf="alumno">
+
+    <div class="carnet-container shadow-lg" id="carnetImprimir">
+
+        <div class="carnet-header">
+            <div class="school-name">🏫 Colegio La PRE</div>
+            <div class="school-subtitle">Carnet de Estudiante</div>
+        </div>
+
+        <div class="carnet-body">
+
+            <div class="photo-frame">
+                <i class="bi bi-person-fill"></i>
+            </div>
+
+            <h2 class="student-name">
+                {{ alumno.nombres }}
+                <br>
+                <span class="student-lastname">{{ alumno.apellidos }}</span>
+            </h2>
+
+            <div class="student-id-box">
+                <span class="id-label">DNI / CÓDIGO</span>
+                <span class="id-value">{{ alumno.dni_ce || alumno.dni }}</span>
+            </div>
+
+            <hr class="divider">
+
+            <div class="qr-wrapper">
+                <ngx-qrcode-styling [config]="config"></ngx-qrcode-styling>
+            </div>
+
+            <p class="scan-instruction">Escanea este código al ingresar</p>
+        </div>
+
+        <div class="carnet-footer">
+            Válido para el Año Académico 2025
+        </div>
+    </div>
+
+    <div class="actions mt-4 d-print-none text-center">
+        <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="imprimirCarnet()">
+            <i class="bi bi-printer-fill me-2"></i> Imprimir Carnet
+        </button>
+    </div>
+
+</div>

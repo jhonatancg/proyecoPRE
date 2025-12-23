@@ -8,6 +8,12 @@ const {
     eliminarAsistencia
 } = require('../controllers/asistenciaController');
 
+const {
+    verificarToken,
+    verificarAdmin,
+    verificarDocente,
+} = require('../middleware/authMiddleware');
+
 /**
  * @swagger
  * tags:
@@ -44,7 +50,7 @@ const {
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', registrarAsistencia);
+router.post('/', verificarToken, registrarAsistencia);
 
 /**
  * @swagger
@@ -58,7 +64,7 @@ router.post('/', registrarAsistencia);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', obtenerAsistencias);
+router.get('/', verificarToken, obtenerAsistencias);
 
 /**
  * @swagger
@@ -72,7 +78,7 @@ router.get('/', obtenerAsistencias);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/hoy', obtenerAsistenciasHoy);
+router.get('/hoy', verificarToken, obtenerAsistenciasHoy);
 
 /**
  * @swagger
@@ -96,6 +102,6 @@ router.get('/hoy', obtenerAsistenciasHoy);
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', eliminarAsistencia);
+router.delete('/:id', verificarToken, eliminarAsistencia);
 
 module.exports = router;

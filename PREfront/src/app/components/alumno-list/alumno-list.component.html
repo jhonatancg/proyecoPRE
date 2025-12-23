@@ -11,9 +11,6 @@
                 <a routerLink="/alumnos/nuevo" class="btn-academic btn-create">
                     <i class="bi bi-person-plus-fill"></i> Nuevo Alumno
                 </a>
-                <button (click)="logout()" class="btn-academic btn-logout">
-                    <i class="bi bi-box-arrow-right"></i> Salir
-                </button>
             </div>
         </div>
 
@@ -71,11 +68,18 @@
 
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end gap-2">
+
+                                <button type="button" (click)="verCarnet(alumno)" class="btn-icon btn-carnet"
+                                    title="Ver Carnet QR">
+                                    <i class="bi bi-qr-code"></i>
+                                </button>
+
                                 <a [routerLink]="['/alumnos/editar', alumno.id]" class="btn-icon btn-edit"
                                     title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <button (click)="eliminarAlumno(alumno.id!)" class="btn-icon btn-delete"
+
+                                <button type="button" (click)="eliminarAlumno(alumno.id!)" class="btn-icon btn-delete"
                                     title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -89,6 +93,23 @@
                 <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
                 <p class="text-muted mt-2">No hay alumnos registrados aún.</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="alumnoSeleccionadoCarnet"></div>
+
+<div class="modal fade show" *ngIf="alumnoSeleccionadoCarnet" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+
+            <div class="text-end mb-2">
+                <button type="button" class="btn-close btn-close-white bg-white" aria-label="Close"
+                    (click)="cerrarCarnet()"></button>
+            </div>
+
+            <app-carnet-digital [alumno]="alumnoSeleccionadoCarnet"></app-carnet-digital>
+
         </div>
     </div>
 </div>
