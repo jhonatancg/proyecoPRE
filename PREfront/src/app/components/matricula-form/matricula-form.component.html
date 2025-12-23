@@ -1,0 +1,101 @@
+<div class="dashboard-container d-flex justify-content-center align-items-center">
+    <div class="card matricula-card shadow-lg">
+
+        <div class="card-header-matricula">
+            <h4 class="mb-0 fw-bold text-white">
+                <i class="bi bi-journal-check me-2"></i> Nueva Matrícula
+            </h4>
+            <p class="mb-0 text-white-50 small">Asignación de alumnos a periodos y secciones</p>
+        </div>
+
+        <div class="card-body p-4">
+            <form [formGroup]="matriculaForm" (ngSubmit)="onSubmit()">
+
+                <div class="mb-4">
+                    <label class="form-label text-primary-dark">
+                        <i class="bi bi-person-fill me-1"></i> Seleccionar Alumno
+                    </label>
+                    <div class="input-group">
+                        <select class="form-select" formControlName="alumno_id"
+                            [class.is-invalid]="isFieldInvalid('alumno_id')">
+                            <option value="" disabled selected>-- Busque un alumno --</option>
+                            <option *ngFor="let alumno of alumnos" [value]="alumno.id">
+                                {{ alumno.apellidos }}, {{ alumno.nombres }} (DNI: {{ alumno.dni_ce }})
+                            </option>
+                        </select>
+                        <button class="btn btn-outline-secondary" type="button" routerLink="/alumnos/nuevo"
+                            title="Crear nuevo alumno">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="isFieldInvalid('alumno_id')">
+                        Debe seleccionar un alumno.
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-primary-dark">Periodo</label>
+                        <select class="form-select" formControlName="periodo_id"
+                            [class.is-invalid]="isFieldInvalid('periodo_id')">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option *ngFor="let periodo of periodos" [value]="periodo.id">
+                                {{ periodo.nombre }} - {{ periodo.anio }}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback d-block" *ngIf="isFieldInvalid('periodo_id')">
+                            Campo obligatorio.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-primary-dark">Sección / Aula</label>
+                        <select class="form-select" formControlName="seccion_id"
+                            [class.is-invalid]="isFieldInvalid('seccion_id')">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option *ngFor="let seccion of secciones" [value]="seccion.id">
+                                {{ seccion.nombre }}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback d-block" *ngIf="isFieldInvalid('seccion_id')">
+                            Campo obligatorio.
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 mt-3">
+                        <label class="form-label text-primary-dark">Situación de Matrícula</label>
+                        <div class="d-flex gap-3 mt-1">
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" formControlName="situacion" id="sit1"
+                                    value="Ingresante">
+                                <label class="form-check-label" for="sit1">Ingresante</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" formControlName="situacion" id="sit2"
+                                    value="Promovido">
+                                <label class="form-check-label" for="sit2">Promovido</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" formControlName="situacion" id="sit3"
+                                    value="Repitente">
+                                <label class="form-check-label" for="sit3">Repitente</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-5">
+                    <button type="submit" class="btn btn-primary-gradient btn-lg shadow-sm"
+                        [disabled]="loading || matriculaForm.invalid">
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ loading ? 'Procesando...' : 'Confirmar Matrícula' }}
+                    </button>
+                    <a routerLink="/matriculas" class="btn btn-link text-muted text-decoration-none text-center">
+                        Cancelar y volver
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

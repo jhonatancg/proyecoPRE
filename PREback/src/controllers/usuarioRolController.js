@@ -12,7 +12,7 @@ const asignarRol = async (req, res) => {
         }
 
         const [existe] = await db.query(
-            'SELECT id FROM usuario_rol WHERE usuario_id = ? AND rol_id = ? AND estado = 1',
+            'SELECT id FROM usuario_roles WHERE usuario_id = ? AND rol_id = ? AND estado = 1',
             [usuario_id, rol_id]
         );
 
@@ -24,7 +24,7 @@ const asignarRol = async (req, res) => {
         }
 
         const [resultado] = await db.query(
-            'INSERT INTO usuario_rol (usuario_id, rol_id) VALUES (?, ?)',
+            'INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (?, ?)',
             [usuario_id, rol_id]
         );
 
@@ -58,7 +58,7 @@ const obtenerRolesPorUsuario = async (req, res) => {
                 ur.usuario_id,
                 r.nombre AS nombre_rol,
                 ur.estado
-            FROM usuario_rol ur
+            FROM usuario_roles ur
             INNER JOIN roles r ON ur.rol_id = r.id
             WHERE ur.usuario_id = ? AND ur.estado = 1
         `;
@@ -85,7 +85,7 @@ const eliminarRolUsuario = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [existe] = await db.query('SELECT id FROM usuario_rol WHERE id = ?', [id]);
+        const [existe] = await db.query('SELECT id FROM usuario_roles WHERE id = ?', [id]);
 
         if (existe.length === 0) {
             return res.status(404).json({
@@ -94,7 +94,7 @@ const eliminarRolUsuario = async (req, res) => {
             });
         }
 
-        await db.query('UPDATE usuario_rol SET estado = 0 WHERE id = ?', [id]);
+        await db.query('UPDATE usuario_roles SET estado = 0 WHERE id = ?', [id]);
 
         res.json({
             success: true,

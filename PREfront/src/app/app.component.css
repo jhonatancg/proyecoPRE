@@ -1,0 +1,74 @@
+/* --- SIDEBAR (Menú Lateral) --- */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0d47a1 0%, #1565c0 100%);
+    color: white;
+
+    /* POSICIONAMIENTO CLAVE */
+    position: fixed;
+    /* Fijo en la pantalla */
+    top: 0;
+    left: 0;
+
+    /* ESTO ES LO QUE ARREGLA EL CLICK: */
+    z-index: 9999;
+    /* Asegura que esté ENCIMA de todo */
+
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    overflow-y: auto;
+    /* Scroll si la pantalla es pequeña */
+}
+
+/* Cabecera del menú */
+.sidebar-header {
+    text-align: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- ENLACES DEL MENÚ --- */
+.nav-item {
+    margin-bottom: 8px;
+    /* Separación entre botones */
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 25px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    border-left: 5px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    /* Quita subrayado */
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding-left: 30px;
+    /* Efecto de movimiento */
+}
+
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left: 5px solid #4fc3f7;
+    /* Barra celeste activa */
+    color: white;
+    font-weight: 600;
+}
+
+/* --- ÁREA DE CONTENIDO PRINCIPAL --- */
+.content-area {
+    /* Mismo ancho que el sidebar para que no se oculte */
+    margin-left: 260px;
+    padding: 30px;
+    background-color: #f5f9ff;
+    min-height: 100vh;
+    width: calc(100% - 260px);
+}

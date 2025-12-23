@@ -1,0 +1,120 @@
+:host {
+    --primary-blue: #0d47a1;
+    --secondary-blue: #1976d2;
+    --sky-blue-light: #f5f9ff;
+    --accent-delete: #ffebee;
+    --accent-delete-text: #c62828;
+}
+
+.dashboard-container {
+    background-color: var(--sky-blue-light);
+    min-height: 100vh;
+    padding: 30px;
+}
+
+.main-card {
+    background: white;
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+}
+
+.card-header-actions {
+    padding: 25px 30px;
+    border-bottom: 1px solid #eef2f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-title {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Botón Nueva Matrícula */
+.btn-create {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-create:hover {
+    box-shadow: 0 5px 15px rgba(13, 71, 161, 0.3);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* Tabla */
+.custom-table th {
+    font-weight: 600;
+    color: #546e7a;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 15px 10px;
+    border-bottom: 2px solid #eef2f6;
+    background-color: #fcfcfc;
+}
+
+.custom-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-row-hover:hover {
+    background-color: #f8fdff;
+}
+
+/* Detalles Visuales */
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    background-color: #e3f2fd;
+    color: var(--primary-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.badge-seccion {
+    background-color: #f5f5f5;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #455a64;
+    border: 1px solid #e0e0e0;
+}
+
+/* Botones de Acción */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-delete {
+    background-color: var(--accent-delete);
+    color: var(--accent-delete-text);
+}
+
+.btn-delete:hover {
+    background-color: #ffcdd2;
+}

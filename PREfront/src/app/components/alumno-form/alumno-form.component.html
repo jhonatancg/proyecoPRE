@@ -1,26 +1,94 @@
-<p>alumno-form works!</p>
-<form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()">
-    <label>nombres</label>
-    <input type="text" formControlName="nombres">
-    <br>
-    <label>apellidos</label>
-    <input type="text" formControlName="apellidos">
-    <br>
-    <label>DNI</label>
-    <input type="text" formControlName="dni_ce">
-    <br>
-    <label>genero</label>
-    <input type="text" formControlName="genero">
-    <br>
-    <label>celular</label>
-    <input type="text" formControlName="celular">
-    <br>
-    <label>apoderado</label>
-    <input type="text" formControlName="apoderado">
-    <br>
-    <label>celular del apoderado</label>
-    <input type="text" formControlName="cel_apoderado">
-    <br>
-    <button type="submit">Guardar</button>
-    <button routerLink="/alumnos">Cancelar</button>
-</form>
+<div class="dashboard-container d-flex justify-content-center">
+    <div class="card form-card shadow-lg">
+
+        <div class="card-header-form">
+            <h4 class="mb-0 fw-bold">
+                <i class="bi bi-person-vcard me-2"></i>
+                {{ alumnoForm.get('id')?.value ? 'Editar Alumno' : 'Registrar Nuevo Alumno' }}
+            </h4>
+            <p class="mb-0 text-white-50 small">Complete la información requerida</p>
+        </div>
+
+        <div class="card-body p-4">
+            <form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()">
+
+                <h6 class="section-title">Información Personal</h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="nombres"
+                            [class.is-invalid]="isFieldInvalid('nombres')" placeholder="Ej. Juan Carlos">
+                        <div class="invalid-feedback">El nombre es obligatorio</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Apellidos <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="apellidos"
+                            [class.is-invalid]="isFieldInvalid('apellidos')" placeholder="Ej. Pérez Gómez">
+                        <div class="invalid-feedback">El apellido es obligatorio</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">DNI / CE <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="dni_ce"
+                            [class.is-invalid]="isFieldInvalid('dni_ce')" placeholder="Ej. 12345678">
+                        <div class="invalid-feedback">El documento es obligatorio</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Género <span class="text-danger">*</span></label>
+                        <select class="form-select" formControlName="genero"
+                            [class.is-invalid]="isFieldInvalid('genero')">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option value="M">Varón</option>
+                            <option value="F">Mujer</option>
+                        </select>
+                        <div class="invalid-feedback">Seleccione un género</div>
+                    </div>
+                </div>
+
+                <h6 class="section-title mt-4">Contacto y Apoderado</h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Celular del Alumno</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-phone"></i></span>
+                            <input type="text" class="form-control" formControlName="celular" placeholder="Opcional">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre del Apoderado <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person-hearts"></i></span>
+                            <input type="text" class="form-control" formControlName="apoderado"
+                                [class.is-invalid]="isFieldInvalid('apoderado')" placeholder="Padre o Tutor">
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Celular del Apoderado <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-whatsapp"></i></span>
+                            <input type="text" class="form-control" formControlName="cel_apoderado"
+                                [class.is-invalid]="isFieldInvalid('cel_apoderado')"
+                                placeholder="Número de contacto principal">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                    <button type="button" routerLink="/alumnos" class="btn btn-outline-secondary px-4">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-save px-4" [disabled]="alumnoForm.invalid">
+                        <i class="bi bi-check-circle-fill me-2"></i> Guardar Alumno
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

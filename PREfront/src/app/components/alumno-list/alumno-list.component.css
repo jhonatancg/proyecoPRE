@@ -1,104 +1,188 @@
-/* Contenedor Principal */
-.main-container {
-    margin: 20px auto;
-    padding: 20px;
-    max-width: 1200px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+/* --- Variables de Tema (Mismas del Login) --- */
+:host {
+    --primary-blue: #0d47a1;
+    --secondary-blue: #1976d2;
+    --sky-blue-light: #f0f7ff;
+    /* Fondo muy claro */
+    --text-dark: #2c3e50;
+    --accent-edit: #e3f2fd;
+    --accent-edit-text: #1565c0;
+    --accent-delete: #ffebee;
+    --accent-delete-text: #c62828;
 }
 
-/* Encabezado */
-.header-section {
+/* 1. Contenedor Principal (Fondo Completo) */
+.dashboard-container {
+    background-color: var(--sky-blue-light);
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 2. Tarjeta Principal */
+.main-card {
+    background: white;
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+    /* Para que el header no se salga */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 3. Encabezado */
+.card-header-actions {
+    padding: 25px 30px;
+    border-bottom: 1px solid #eef2f6;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-}
-
-.header-section h2 {
-    color: #333;
-    margin: 0;
-}
-
-/* Botón Nuevo */
-.btn-new {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-.btn-new:hover {
-    background-color: #218838;
-}
-
-/* Tabla */
-.table-wrapper {
-    overflow-x: auto;
-}
-
-.fl-table {
-    width: 100%;
-    border-collapse: collapse;
+    flex-wrap: wrap;
+    /* Responsive */
+    gap: 15px;
     background: white;
-    border-radius: 5px;
-    overflow: hidden;
 }
 
-.fl-table thead {
-    background: #34495e;
-    color: white;
+.page-title {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.5rem;
 }
 
-.fl-table th,
-.fl-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+.title-section p {
+    margin: 0;
+    font-size: 0.9rem;
 }
 
-.fl-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Texto pequeño */
-.sub-text {
-    font-size: 0.85em;
-    color: #666;
-}
-
-/* Botones de Acción */
-.actions-cell {
+/* 4. Botones Superiores */
+.buttons-section {
     display: flex;
     gap: 10px;
 }
 
-.btn-action {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
+.btn-academic {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
     text-decoration: none;
-    color: white;
-    transition: opacity 0.3s;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }
 
-.btn-action:hover {
-    opacity: 0.8;
+.btn-create {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    box-shadow: 0 4px 10px rgba(13, 71, 161, 0.2);
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(13, 71, 161, 0.3);
+    color: white;
+}
+
+.btn-logout {
+    background-color: transparent;
+    border: 1px solid #ffcdd2;
+    color: #e53935;
+}
+
+.btn-logout:hover {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* 5. Tabla Personalizada */
+.custom-table {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.custom-table thead {
+    background-color: #f8f9fa;
+}
+
+.custom-table th {
+    font-weight: 600;
+    color: #546e7a;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 15px 10px;
+    border-bottom: 2px solid #eef2f6;
+}
+
+.custom-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-row-hover:hover {
+    background-color: #f8fdff;
+    /* Efecto hover celeste muy sutil */
+}
+
+/* 6. Avatar del Alumno (Círculo con inicial) */
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #42a5f5, #1976d2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 7. Badges y Etiquetas */
+.badge-dni {
+    background-color: #eceff1;
+    color: #455a64;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* 8. Botones de Acción (Iconos) */
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .btn-edit {
-    background-color: #007bff;
-    /* Azul */
+    background-color: var(--accent-edit);
+    color: var(--accent-edit-text);
+}
+
+.btn-edit:hover {
+    background-color: #bbdefb;
+    color: #0d47a1;
 }
 
 .btn-delete {
-    background-color: #dc3545;
-    /* Rojo */
+    background-color: var(--accent-delete);
+    color: var(--accent-delete-text);
+}
+
+.btn-delete:hover {
+    background-color: #ffcdd2;
+    color: #b71c1c;
 }

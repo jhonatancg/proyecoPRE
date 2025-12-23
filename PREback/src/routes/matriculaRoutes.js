@@ -8,6 +8,12 @@ const {
     eliminarMatricula
 } = require('../controllers/matriculaController');
 
+const {
+    verificarToken,
+    verificarAdmin,
+    verificarDocente,
+} = require('../middleware/authMiddleware');
+
 /**
  * @swagger
  * tags:
@@ -53,7 +59,7 @@ const {
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', crearMatricula);
+router.post('/', verificarToken, verificarAdmin, crearMatricula);
 
 /**
  * @swagger
@@ -67,7 +73,7 @@ router.post('/', crearMatricula);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', obtenerMatriculas);
+router.get('/', verificarToken, verificarDocente, obtenerMatriculas);
 
 /**
  * @swagger
@@ -109,7 +115,7 @@ router.get('/', obtenerMatriculas);
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', modificarMatricula);
+router.put('/:id', verificarToken, verificarAdmin, modificarMatricula);
 
 /**
  * @swagger
@@ -133,6 +139,6 @@ router.put('/:id', modificarMatricula);
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', eliminarMatricula);
+router.delete('/:id', verificarToken, verificarAdmin, eliminarMatricula);
 
 module.exports = router;

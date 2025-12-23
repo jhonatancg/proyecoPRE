@@ -1,41 +1,94 @@
-<div class="main-container">
-    <div class="header-section">
-        <h2>Gestión de Alumnos</h2>
-        <a routerLink="/alumnos/nuevo" class="btn-new">Nuevo Alumno</a>
-    </div>
+<div class="dashboard-container">
+    <div class="main-card shadow-lg">
 
-    <div class="table-wrapper">
-        <table class="fl-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Alumno</th>
-                    <th>DNI</th>
-                    <th>Género</th>
-                    <th>Celular</th>
-                    <th>Datos Apoderado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let alumno of alumnos">
-                    <td>{{alumno.id}}</td>
-                    <td>
-                        <strong>{{alumno.apellidos}}</strong>, {{alumno.nombres}}
-                    </td>
-                    <td>{{alumno.dni_ce}}</td>
-                    <td>{{alumno.genero}}</td>
-                    <td>{{alumno.celular || 'N/A'}}</td>
-                    <td>
-                        {{alumno.apoderado}} <br>
-                        <span class="sub-text">({{alumno.cel_apoderado}})</span>
-                    </td>
-                    <td class="actions-cell">
-                        <a [routerLink]="['/alumnos/editar', alumno.id]" class="btn-action btn-edit">Editar</a>
-                        <button (click)="eliminarAlumno(alumno.id!)" class="btn-action btn-delete">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="card-header-actions">
+            <div class="title-section">
+                <h2 class="page-title">Directorio de Alumnos</h2>
+                <p class="text-muted">Gestión escolar y matrículas</p>
+            </div>
+
+            <div class="buttons-section">
+                <a routerLink="/alumnos/nuevo" class="btn-academic btn-create">
+                    <i class="bi bi-person-plus-fill"></i> Nuevo Alumno
+                </a>
+                <button (click)="logout()" class="btn-academic btn-logout">
+                    <i class="bi bi-box-arrow-right"></i> Salir
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col" class="ps-4">Estudiante</th>
+                        <th scope="col">Documento</th>
+                        <th scope="col">Contacto</th>
+                        <th scope="col">Apoderado</th>
+                        <th scope="col" class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let alumno of alumnos" class="table-row-hover">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="student-avatar me-3">
+                                    {{ alumno.nombres.charAt(0) }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ alumno.apellidos }}</div>
+                                    <div class="text-muted small">{{ alumno.nombres }}</div>
+                                    <span class="badge bg-light text-secondary border mt-1">
+                                        {{ alumno.genero === 'M' ? 'Masculino' : 'Femenino' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge-dni">
+                                <i class="bi bi-card-heading"></i> {{ alumno.dni_ce }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div *ngIf="alumno.celular; else noCel">
+                                <i class="bi bi-whatsapp text-success"></i> {{ alumno.celular }}
+                            </div>
+                            <ng-template #noCel>
+                                <span class="text-muted small">--</span>
+                            </ng-template>
+                        </td>
+
+                        <td>
+                            <div class="small">
+                                <i class="bi bi-person text-primary"></i> {{ alumno.apoderado }}
+                            </div>
+                            <div class="small text-muted" *ngIf="alumno.cel_apoderado">
+                                <i class="bi bi-phone"></i> {{ alumno.cel_apoderado }}
+                            </div>
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a [routerLink]="['/alumnos/editar', alumno.id]" class="btn-icon btn-edit"
+                                    title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button (click)="eliminarAlumno(alumno.id!)" class="btn-icon btn-delete"
+                                    title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="alumnos.length === 0" class="text-center py-5">
+                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No hay alumnos registrados aún.</p>
+            </div>
+        </div>
     </div>
 </div>

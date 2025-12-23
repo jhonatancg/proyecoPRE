@@ -60,7 +60,7 @@ const verificarAdmin = async (req, res, next) => {
         const query = `
             SELECT r.nombre 
             FROM roles r
-            INNER JOIN usuario_rol ur ON r.id = ur.rol_id
+            INNER JOIN usuario_roles ur ON r.id = ur.rol_id
             WHERE ur.usuario_id = ? AND ur.estado = 1 AND r.estado = 1
         `;
 
@@ -98,7 +98,7 @@ const verificarDocente = async (req, res, next) => {
         const query = `
             SELECT r.nombre 
             FROM roles r
-            INNER JOIN usuario_rol ur ON r.id = ur.rol_id
+            INNER JOIN usuario_roles ur ON r.id = ur.rol_id
             WHERE ur.usuario_id = ? AND ur.estado = 1
         `;
 
@@ -132,7 +132,7 @@ const verificarAlumno = async (req, res, next) => {
         const query = `
             SELECT r.nombre 
             FROM roles r
-            INNER JOIN usuario_rol ur ON r.id = ur.rol_id
+            INNER JOIN usuario_roles ur ON r.id = ur.rol_id
             WHERE ur.usuario_id = ? AND ur.estado = 1
         `;
 

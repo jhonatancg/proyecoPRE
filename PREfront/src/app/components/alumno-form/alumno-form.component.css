@@ -1,0 +1,113 @@
+/* Heredamos variables y fondo del dashboard */
+:host {
+    --primary-blue: #0d47a1;
+    --secondary-blue: #1976d2;
+    --form-bg: #ffffff;
+    --section-title: #546e7a;
+}
+
+.dashboard-container {
+    background-color: #f0f7ff;
+    /* Mismo fondo celeste claro */
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Tarjeta del Formulario */
+.form-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 800px;
+    /* Ancho máximo ideal para formularios */
+    background-color: var(--form-bg);
+}
+
+/* Encabezado Azul */
+.card-header-form {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    padding: 20px 30px;
+    border-bottom: 4px solid #90caf9;
+}
+
+/* Títulos de Sección (Línea divisoria con texto) */
+.section-title {
+    color: var(--primary-blue);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #e3f2fd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Estilo de Inputs */
+.form-label {
+    font-weight: 600;
+    color: #37474f;
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #cfd8dc;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+    background-color: #fcfdfe;
+}
+
+/* Input Groups (Iconos al lado del input) */
+.input-group-text {
+    border-color: #cfd8dc;
+    color: var(--secondary-blue);
+    background-color: #f8f9fa;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+/* Botón Guardar */
+.btn-save {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.btn-save:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-save:disabled {
+    background: #cfd8dc;
+    cursor: not-allowed;
+}
+
+/* Botón Cancelar */
+.btn-outline-secondary {
+    border-radius: 8px;
+    font-weight: 600;
+    color: #546e7a;
+    border-color: #cfd8dc;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #eceff1;
+    color: #37474f;
+    border-color: #b0bec5;
+}

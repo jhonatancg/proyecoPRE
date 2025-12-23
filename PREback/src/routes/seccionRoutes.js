@@ -8,6 +8,11 @@ const {
     eliminarSeccion
 } = require('../controllers/seccionController');
 
+const {
+    verificarToken,
+    verificarAdmin
+} = require('../middleware/authMiddleware');
+
 /**
  * @swagger
  * tags:
@@ -41,7 +46,7 @@ const {
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', crearSeccion);
+router.post('/', verificarToken, verificarAdmin, crearSeccion);
 
 /**
  * @swagger
@@ -55,7 +60,7 @@ router.post('/', crearSeccion);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', obtenerSeccion);
+router.get('/', verificarToken, obtenerSeccion);
 
 /**
  * @swagger
@@ -93,7 +98,7 @@ router.get('/', obtenerSeccion);
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', modificarSeccion);
+router.put('/:id', verificarToken, verificarAdmin, modificarSeccion);
 
 /**
  * @swagger
@@ -117,6 +122,6 @@ router.put('/:id', modificarSeccion);
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', eliminarSeccion);
+router.delete('/:id', verificarToken, verificarAdmin, eliminarSeccion);
 
 module.exports = router;

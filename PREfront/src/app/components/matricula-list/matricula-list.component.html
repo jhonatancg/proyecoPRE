@@ -1,0 +1,97 @@
+<div class="dashboard-container">
+    <div class="main-card shadow-lg">
+
+        <div class="card-header-actions">
+            <div class="title-section">
+                <h2 class="page-title">Gestión de Matrículas</h2>
+                <p class="text-muted">Relación de alumnos inscritos por periodo</p>
+            </div>
+
+            <div class="buttons-section">
+                <a routerLink="/matriculas/nueva" class="btn-academic btn-create">
+                    <i class="bi bi-plus-circle-fill"></i> Nueva Matrícula
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Alumno</th>
+                        <th>Sección</th>
+                        <th>Periodo</th>
+                        <th>Fecha</th>
+                        <th>Situación</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let m of matriculas" class="table-row-hover">
+
+                        <td class="ps-4 fw-bold text-muted">#{{ m.id }}</td>
+
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2">
+                                    {{ m.alumno_nombres?.charAt(0) }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">
+                                        {{ m.alumno_apellidos }}, {{ m.alumno_nombres }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge-seccion">
+                                <i class="bi bi-shop"></i> {{ m.seccion }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="fw-semibold text-primary">
+                                {{ m.periodo }}
+                            </span>
+                            <small class="text-muted d-block">{{ m.anio_academico }}</small>
+                        </td>
+
+                        <td class="text-muted small">
+                            {{ m.fecha_matricula | date:'dd/MM/yyyy' }}
+                        </td>
+
+                        <td>
+                            <span class="badge rounded-pill" [ngClass]="{
+                                    'bg-success': m.situacion === 'Promovido',
+                                    'bg-info text-dark': m.situacion === 'Ingresante',
+                                    'bg-warning text-dark': m.situacion === 'Repitente',
+                                    'bg-secondary': !['Promovido','Ingresante','Repitente'].includes(m.situacion)
+                                }">
+                                {{ m.situacion }}
+                            </span>
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <button (click)="eliminarMatricula(m.id)" class="btn-icon btn-delete"
+                                title="Anular Matrícula">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Cargando registros...</p>
+            </div>
+
+            <div *ngIf="!loading && matriculas.length === 0" class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No se encontraron matrículas registradas.</p>
+            </div>
+        </div>
+    </div>
+</div>

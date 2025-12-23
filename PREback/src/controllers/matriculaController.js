@@ -2,7 +2,7 @@ const db = require('../config/database');
 
 const crearMatricula = async (req, res) => {
     try {
-        const { alumno_id, seccion_id, periodo_id, situacion } = req.body;
+        const { alumno_id, periodo_id, seccion_id, situacion } = req.body;
 
         if (!alumno_id || !seccion_id || !periodo_id || !situacion) {
             return res.status(400).json({

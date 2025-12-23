@@ -3,6 +3,7 @@ import { Alumno } from '../../models/alumno.interface';
 import { AlumnoService } from '../../services/alumno.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-alumno-list',
@@ -16,7 +17,7 @@ export class AlumnoListComponent implements OnInit {
   alumno!: Alumno;
   error: string = '';
 
-  constructor(private alumnoService: AlumnoService) {
+  constructor(private alumnoService: AlumnoService, private authService: AuthService) {
   }
 
   ngOnInit(): void {
@@ -35,6 +36,9 @@ export class AlumnoListComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+  logout(): void {
+    this.authService.logout();
   }
 
   eliminarAlumno(id: number) {

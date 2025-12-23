@@ -1,0 +1,100 @@
+/* Heredamos variables consistentes con el resto de la app */
+:host {
+    --primary-blue: #0d47a1;
+    --secondary-blue: #1976d2;
+    --light-bg: #e3f2fd;
+    --white: #ffffff;
+    --text-dark: #37474f;
+}
+
+/* Fondo general */
+.dashboard-container {
+    background-color: #f5f9ff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Tarjeta Principal */
+.matricula-card {
+    border: none;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 600px;
+    /* Un poco más angosta para enfocar la atención */
+    background-color: var(--white);
+    overflow: hidden;
+}
+
+/* Encabezado */
+.card-header-matricula {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    padding: 25px 30px;
+    border-bottom: 5px solid #90caf9;
+}
+
+/* Etiquetas y Textos */
+.text-primary-dark {
+    color: var(--primary-blue);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* Inputs y Selects */
+.form-select,
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #cfd8dc;
+    padding: 10px 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.15);
+    background-color: #fafdff;
+}
+
+/* Estilo para los Radio Buttons */
+.custom-radio .form-check-input:checked {
+    background-color: var(--secondary-blue);
+    border-color: var(--secondary-blue);
+}
+
+.custom-radio .form-check-label {
+    cursor: pointer;
+    font-weight: 500;
+    color: #546e7a;
+}
+
+/* Botón Principal */
+.btn-primary-gradient {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary-gradient:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(13, 71, 161, 0.25);
+}
+
+.btn-primary-gradient:disabled {
+    background: #b0bec5;
+    cursor: not-allowed;
+}
+
+/* Botón "+" para agregar alumno rápido */
+.btn-outline-secondary {
+    border-color: #cfd8dc;
+    color: var(--secondary-blue);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--light-bg);
+    border-color: var(--secondary-blue);
+}

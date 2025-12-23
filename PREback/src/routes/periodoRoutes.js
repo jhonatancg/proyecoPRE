@@ -7,6 +7,10 @@ const {
     modificarPeriodo,
     eliminarPeriodo
 } = require('../controllers/periodoController');
+const {
+    verificarToken,
+    verificarAdmin
+} = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -58,7 +62,7 @@ const {
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', crearPeriodo);
+router.post('/', verificarToken, verificarAdmin, crearPeriodo);
 
 /**
  * @swagger
@@ -72,7 +76,7 @@ router.post('/', crearPeriodo);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', obtenerPeriodos);
+router.get('/', verificarToken, obtenerPeriodos);
 
 /**
  * @swagger
@@ -127,7 +131,7 @@ router.get('/', obtenerPeriodos);
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', modificarPeriodo);
+router.put('/:id', verificarToken, verificarAdmin, modificarPeriodo);
 
 /**
  * @swagger
@@ -151,6 +155,6 @@ router.put('/:id', modificarPeriodo);
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', eliminarPeriodo);
+router.delete('/:id', verificarToken, verificarAdmin, eliminarPeriodo);
 
 module.exports = router;

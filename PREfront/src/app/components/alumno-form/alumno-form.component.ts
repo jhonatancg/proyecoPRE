@@ -54,6 +54,10 @@ export class AlumnoFormComponent implements OnInit {
       }
     })
   }
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.alumnoForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
 
   onSubmit() {
     const alumnoData = this.alumnoForm.value;

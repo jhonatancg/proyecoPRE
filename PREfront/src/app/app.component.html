@@ -1,1 +1,67 @@
-<router-outlet />
+<ng-container *ngIf="!authService.isAuthenticated()">
+    <router-outlet></router-outlet>
+</ng-container>
+
+<div *ngIf="authService.isAuthenticated()">
+
+    <div class="sidebar shadow-lg">
+
+        <div class="sidebar-header">
+            <h4 class="fw-bold mb-0">🏫 Colegio La PRE</h4>
+            <small style="color: #bbdefb;">Sistema Académico</small>
+        </div>
+
+        <ul class="nav flex-column mt-4">
+
+            <li class="nav-item">
+                <a routerLink="/alumnos" routerLinkActive="active" class="nav-link">
+                    <i class="bi bi-people-fill me-3"></i> Alumnos
+                </a>
+            </li>
+
+            <li class="nav-item mt-3 mb-1">
+                <span class="text-uppercase small fw-bold px-3"
+                    style="color: #90caf9; letter-spacing: 1px; font-size: 0.70rem;">
+                    Gestión de Matrículas
+                </span>
+            </li>
+
+            <li class="nav-item">
+                <a routerLink="/matriculas" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                    class="nav-link">
+                    <i class="bi bi-card-list me-3"></i> Ver Matrículas
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a routerLink="/matriculas/nueva" routerLinkActive="active" class="nav-link">
+                    <i class="bi bi-journal-plus me-3"></i> Nueva Matrícula
+                </a>
+            </li>
+
+            <li class="nav-item mt-4 mb-2">
+                <span class="text-uppercase small fw-bold px-3"
+                    style="color: #90caf9; letter-spacing: 1px; font-size: 0.75rem;">
+                    Administración
+                </span>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link disabled-link" title="Próximamente">
+                    <i class="bi bi-calendar-event me-3"></i> Periodos
+                </a>
+            </li>
+
+            <li class="nav-item mt-auto pt-5">
+                <a (click)="logout()" class="nav-link cursor-pointer" style="color: #ffcdd2 !important;">
+                    <i class="bi bi-box-arrow-left me-3"></i> Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content-area">
+        <router-outlet></router-outlet>
+    </div>
+
+</div>
