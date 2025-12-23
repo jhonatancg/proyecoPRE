@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const crearUsuario = async (req, res) => {
     try {
@@ -167,9 +168,88 @@ const eliminarUsuario = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    try {
+        const { usuario, password } = req.body;
+
+        if (!usuario || !password) {
+            return res.status(400).json({
+                success: false,
+                mensaje: 'Usuario y contraseña son obligatorios'
+            });
+        }
+
+        const [users] = await db.query(
+            'SELECT * FROM usuarios WHERE usuario = ? AND estado = 1',
+            [usuario]
+        );
+
+        if (users.length === 0) {
+            return res.status(401).json({
+                success: false,
+                mensaje: 'Credenciales inválidas'
+            });
+        }
+
+        const user = users[0];
+
+        const validPassword = await bcrypt.compare(password, user.password);
+
+        if (!validPassword) {
+            return res.status(401).json({
+                success: false,
+                mensaje: 'Credenciales inválidas'
+            });
+        }
+        const queryRol = `
+            SELECT r.nombre 
+            FROM roles r
+            INNER JOIN usuario_roles ur ON r.id = ur.rol_id
+            WHERE ur.usuario_id = ? AND ur.estado = 1
+            LIMIT 1
+        `;
+
+        const [rolesEncontrados] = await db.query(queryRol, [user.id]);
+
+        const rolUsuario = rolesEncontrados.length > 0 ? rolesEncontrados[0].nombre : 'GUEST';
+
+        const token = jwt.sign(
+            {
+                id: user.id,
+                usuario: user.usuario,
+                nombre_completo: user.nombre_completo,
+                rol: rolUsuario
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        );
+
+        res.json({
+            success: true,
+            mensaje: 'Inicio de sesión exitoso',
+            token,
+            usuario: {
+                id: user.id,
+                nombre_completo: user.nombre_completo,
+                usuario: user.usuario,
+                rol: rolUsuario
+            }
+        });
+
+    } catch (error) {
+        console.error('Error en login:', error);
+        res.status(500).json({
+            success: false,
+            mensaje: 'Error al iniciar sesión',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     crearUsuario,
     obtenerUsuario,
     modificarUsuario,
-    eliminarUsuario
+    eliminarUsuario,
+    login
 }

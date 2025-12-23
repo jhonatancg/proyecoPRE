@@ -5,8 +5,14 @@ const {
     crearUsuario,
     obtenerUsuario,
     modificarUsuario,
-    eliminarUsuario
+    eliminarUsuario,
+    login
 } = require('../controllers/usuarioController');
+
+const {
+    verificarToken,
+    verificarAdmin
+} = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -17,10 +23,42 @@ const {
 
 /**
  * @swagger
+ * /usuarios/login:
+ *   post:
+ *     summary: Iniciar sesión
+ *     tags: [Usuarios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - usuario
+ *               - password
+ *             properties:
+ *               usuario:
+ *                 type: string
+ *                 example: admin
+ *               password:
+ *                 type: string
+ *                 example: 123456
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *       401:
+ *         description: Credenciales inválidas
+ */
+router.post('/login', login);
+
+/**
+ * @swagger
  * /usuarios:
  *   post:
- *     summary: Crear un nuevo usuario
+ *     summary: Crear un nuevo usuario (ADMIN)
  *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -44,10 +82,8 @@ const {
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
- *       400:
- *         description: Error de validación o duplicado
- *       500:
- *         description: Error interno del servidor
+ *       403:
+ *         description: Acceso denegado
  */
 router.post('/', crearUsuario);
 
@@ -55,30 +91,31 @@ router.post('/', crearUsuario);
  * @swagger
  * /usuarios:
  *   get:
- *     summary: Obtener todos los usuarios activos
+ *     summary: Obtener usuarios activos (ADMIN)
  *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Lista de usuarios activos
- *       500:
- *         description: Error interno del servidor
+ *         description: Lista de usuarios
  */
-router.get('/', obtenerUsuario);
+router.get('/', verificarToken, verificarAdmin, obtenerUsuario);
 
 /**
  * @swagger
  * /usuarios/{id}:
  *   put:
- *     summary: Modificar un usuario existente
+ *     summary: Modificar usuario (ADMIN)
  *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID del usuario
  *         schema:
  *           type: integer
- *           example: 1
+ *         example: 5
  *     requestBody:
  *       required: true
  *       content:
@@ -91,48 +128,40 @@ router.get('/', obtenerUsuario);
  *             properties:
  *               nombre_completo:
  *                 type: string
- *                 example: Juan Pérez
  *               usuario:
  *                 type: string
- *                 example: jperez
  *               password:
  *                 type: string
- *                 description: Opcional. Solo enviar si se desea cambiar.
- *                 example: nueva123
+ *                 description: Opcional
  *     responses:
  *       200:
- *         description: Usuario modificado exitosamente
- *       400:
- *         description: Error de validación o duplicado
+ *         description: Usuario modificado
  *       404:
  *         description: Usuario no encontrado
- *       500:
- *         description: Error interno del servidor
  */
-router.put('/:id', modificarUsuario);
+router.put('/:id', verificarToken, verificarAdmin, modificarUsuario);
 
 /**
  * @swagger
  * /usuarios/{id}:
  *   delete:
- *     summary: Eliminar un usuario (borrado lógico)
+ *     summary: Eliminar usuario (borrado lógico, ADMIN)
  *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID del usuario
  *         schema:
  *           type: integer
- *           example: 1
+ *         example: 5
  *     responses:
  *       200:
- *         description: Usuario desactivado exitosamente
+ *         description: Usuario eliminado
  *       404:
  *         description: Usuario no encontrado
- *       500:
- *         description: Error interno del servidor
  */
-router.delete('/:id', eliminarUsuario);
+router.delete('/:id', verificarToken, verificarAdmin, eliminarUsuario);
 
 module.exports = router;

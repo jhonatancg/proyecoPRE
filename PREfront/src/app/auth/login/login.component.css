@@ -1,0 +1,174 @@
+/* --- Paleta de Colores --- */
+:host {
+    --primary-blue: #0d47a1;
+    /* Azul oscuro institucional */
+    --secondary-blue: #1976d2;
+    /* Azul medio brillante */
+    --sky-blue-light: #e3f2fd;
+    /* Celeste muy claro para fondos */
+    --sky-blue-accent: #90caf9;
+    /* Celeste para bordes y acentos */
+    --text-dark: #37474f;
+    /* Gris azulado oscuro para texto */
+    --text-muted: #78909c;
+    /* Gris azulado claro para subtítulos */
+    --white: #ffffff;
+}
+
+/* 1. Fondo Principal */
+.login-container {
+    /* Degradado suave */
+    background: linear-gradient(135deg, var(--white) 0%, var(--sky-blue-light) 100%);
+
+    /* Ocupar toda la altura de la pantalla */
+    min-height: 100vh;
+    width: 100%;
+
+    /* --- MAGIA DEL CENTRADO --- */
+    display: flex;
+    /* Activa Flexbox */
+    justify-content: center;
+    /* Centra Horizontalmente (Izquierda-Derecha) */
+    align-items: center;
+    /* Centra Verticalmente (Arriba-Abajo) */
+    padding: 20px;
+    /* Evita que toque los bordes en celulares */
+}
+
+/* 2. La Tarjeta de Login */
+.login-card {
+    border: none;
+    border-radius: 16px;
+    /* Bordes más redondeados y modernos */
+    /* Sombra azulada suave que levanta la tarjeta */
+    box-shadow: 0 10px 30px rgba(13, 71, 161, 0.1) !important;
+    position: relative;
+    /* Necesario para la barra superior */
+    overflow: hidden;
+    /* Asegura que la barra superior siga las curvas */
+    width: 100%;
+    max-width: 420px;
+    /* Un poco más ancho para que respire */
+    background-color: var(--white);
+}
+
+/* Barra decorativa superior azul */
+.card-header-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    /* Gradiente horizontal en la barra superior */
+    background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+}
+
+/* 3. Tipografía y Títulos */
+.academic-title {
+    color: var(--primary-blue);
+    letter-spacing: -0.5px;
+    margin-top: 1rem;
+}
+
+.subtitle {
+    color: var(--text-muted) !important;
+}
+
+.custom-label {
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 4. Campos de Input */
+.input-group-text {
+    border-color: #cfd8dc;
+    /* Borde gris suave por defecto */
+    background-color: var(--white) !important;
+    color: var(--secondary-blue) !important;
+    /* Iconos azules */
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-control {
+    border-color: #cfd8dc;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 0.75rem 1rem;
+    /* Inputs más altos y cómodos */
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al hacer Foco en los inputs */
+.form-control:focus {
+    /* Borde celeste brillante */
+    border-color: var(--secondary-blue);
+    /* Sombra de resplandor celeste */
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
+    /* Fondo ligeramente celeste */
+    background-color: #f8fdff;
+}
+
+/* Cuando el input tiene foco, el icono también se ilumina */
+.form-control:focus+.input-group-text,
+.input-group:focus-within .input-group-text {
+    border-color: var(--secondary-blue);
+    background-color: #f8fdff !important;
+}
+
+/* Mensajes de error */
+.invalid-feedback {
+    font-size: 0.85em;
+    margin-top: 0.3rem;
+}
+
+/* 5. Botón Principal */
+.btn-academic-primary {
+    /* Gradiente azul vibrante */
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    border: none;
+    color: var(--white);
+    font-weight: 600;
+    padding: 0.8rem;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+/* Efecto Hover del botón */
+.btn-academic-primary:hover:not(:disabled) {
+    /* Invertimos ligeramente el gradiente y lo levantamos */
+    background: linear-gradient(45deg, var(--secondary-blue), var(--primary-blue));
+    box-shadow: 0 6px 15px rgba(25, 118, 210, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-academic-primary:disabled {
+    background: #b0bec5;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* 6. Alerta de Error Personalizada */
+.alert-custom-danger {
+    background-color: #ffebee;
+    /* Rojo muy claro */
+    color: #c62828;
+    /* Rojo oscuro */
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border-left: 4px solid #ef5350;
+    /* Barra roja a la izquierda */
+}
+
+/* 7. Footer */
+.footer-text {
+    color: var(--text-muted) !important;
+    font-weight: 500;
+}
