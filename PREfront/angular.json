@@ -24,12 +24,24 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ngx-scanner-qrcode/wasm/",
+                "output": "/assets/wasm/"
               }
             ],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "public/assets/plantilla/css/dashboard.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "public/assets/plantilla/js/main.js",
+              "public/assets/plantilla/js/layout.js",
+              "public/assets/plantilla/js/dashboard.js"
+            ]
           },
           "configurations": {
             "production": {

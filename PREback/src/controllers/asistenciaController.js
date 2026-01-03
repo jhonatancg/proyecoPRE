@@ -25,7 +25,7 @@ const registrarAsistencia = async (req, res) => {
         const alumno_id = alumno.id;
 
         const [existe] = await db.query(
-            'SELECT id FROM asistencia WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1',
+            'SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1',
             [alumno_id]
         );
 
@@ -43,7 +43,7 @@ const registrarAsistencia = async (req, res) => {
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
 
         const [resultado] = await db.query(
-            'INSERT INTO asistencia (alumno_id, fecha, hora_entrada, situacion) VALUES (?, CURDATE(), CURTIME(), ?)',
+            'INSERT INTO asistencias (alumno_id, fecha, hora_entrada, situacion) VALUES (?, CURDATE(), CURTIME(), ?)',
             [alumno_id, situacionFinal]
         );
 
@@ -79,7 +79,7 @@ const obtenerAsistencias = async (req, res) => {
                 alu.nombres AS alumno_nombres, 
                 alu.apellidos AS alumno_apellidos,
                 alu.dni
-            FROM asistencia asi
+            FROM asistencias asi
             INNER JOIN alumnos alu ON asi.alumno_id = alu.id
             WHERE asi.estado = 1
             ORDER BY asi.fecha DESC, asi.hora_entrada DESC
@@ -112,7 +112,7 @@ const obtenerAsistenciasHoy = async (req, res) => {
                 asi.situacion,
                 alu.nombres, 
                 alu.apellidos
-            FROM asistencia asi
+            FROM asistencias asi
             INNER JOIN alumnos alu ON asi.alumno_id = alu.id
             WHERE asi.estado = 1 AND asi.fecha = CURDATE()
             ORDER BY asi.hora_entrada DESC
@@ -141,12 +141,12 @@ const eliminarAsistencia = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [existe] = await db.query('SELECT id FROM asistencia WHERE id = ?', [id]);
+        const [existe] = await db.query('SELECT id FROM asistencias WHERE id = ?', [id]);
         if (existe.length === 0) {
             return res.status(404).json({ success: false, mensaje: "Registro no encontrado" });
         }
 
-        await db.query('UPDATE asistencia SET estado = 0 WHERE id = ?', [id]);
+        await db.query('UPDATE asistencias SET estado = 0 WHERE id = ?', [id]);
 
         res.json({
             success: true,

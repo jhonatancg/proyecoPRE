@@ -1,57 +1,86 @@
-<div class="login-container d-flex justify-content-center align-items-center vh-100">
-    <div class="card login-card shadow-lg p-4">
-        <div class="card-header-accent"></div>
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="brand-logo">
+                    <img src="assets/img/logo-pre.png" alt="Escudo Colegio La PRE" class="img-fluid">
+                </div>
+                <h1 class="h3 mb-2 fw-bold">¡Bienvenido!</h1>
+                <p class="text-muted">Ingresa al Sistema Académico</p>
+            </div>
 
-        <div class="text-center mb-4 mt-3">
-            <h3 class="fw-bold academic-title">Sistema Académico</h3>
-            <p class="text-muted subtitle">Ingrese sus credenciales</p>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+                <div class="mb-3">
+                    <label for="usuario" class="form-label">Usuario</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
+                        <input type="text" class="form-control" id="usuario" formControlName="usuario"
+                            placeholder="Ej. admin" [class.is-invalid]="isFieldInvalid('usuario')">
+                    </div>
+                    <div *ngIf="isFieldInvalid('usuario')" class="invalid-feedback d-block">
+                        {{ getErrorMessage('usuario') }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="password"
+                            formControlName="password" placeholder="Ingresa tu contraseña"
+                            [class.is-invalid]="isFieldInvalid('password')">
+
+                        <button class="btn btn-outline-secondary" type="button" (click)="togglePasswordVisibility()">
+                            <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                        </button>
+                    </div>
+                    <div *ngIf="isFieldInvalid('password')" class="invalid-feedback d-block">
+                        {{ getErrorMessage('password') }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Recordarme
+                        </label>
+                    </div>
+                </div>
+
+                <div *ngIf="error" class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>{{ error }}</div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg custom-btn" type="submit"
+                        [disabled]="loading || loginForm.invalid">
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"
+                            aria-hidden="true"></span>
+                        {{ loading ? 'Ingresando...' : 'Iniciar Sesión' }}
+                    </button>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <p class="mb-0">
+                        <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    </p>
+                </div>
+            </form>
         </div>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-
-            <div class="mb-3">
-                <label for="usuario" class="form-label custom-label">Usuario</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 text-primary">
-                        <i class="bi bi-person-fill"></i>
-                    </span>
-                    <input type="text" id="usuario" class="form-control border-start-0 ps-0" formControlName="usuario"
-                        [class.is-invalid]="isFieldInvalid('usuario')" placeholder="Ej. admin">
-                </div>
-                <div *ngIf="isFieldInvalid('usuario')" class="invalid-feedback d-block">
-                    {{ getErrorMessage('usuario') }}
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label custom-label">Contraseña</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 text-primary">
-                        <i class="bi bi-lock-fill"></i>
-                    </span>
-                    <input type="password" id="password" class="form-control border-start-0 ps-0"
-                        formControlName="password" [class.is-invalid]="isFieldInvalid('password')" placeholder="******">
-                </div>
-                <div *ngIf="isFieldInvalid('password')" class="invalid-feedback d-block">
-                    {{ getErrorMessage('password') }}
-                </div>
-            </div>
-
-            <div *ngIf="error" class="alert alert-custom-danger text-center p-2 mb-3" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
-            </div>
-
-            <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-academic-primary btn-lg" [disabled]="loading || loginForm.invalid">
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"
-                        aria-hidden="true"></span>
-                    {{ loading ? 'Ingresando...' : 'Iniciar Sesión' }}
-                </button>
-            </div>
-        </form>
-
-        <div class="mt-4 text-center text-muted small footer-text">
-            &copy; 2025 Colegio San Agustín
+        <div class="text-center mt-4">
+            <p class="text-white-50 small">
+                &copy; 2025 Colegio La PRE. Todos los derechos reservados.
+            </p>
         </div>
     </div>
 </div>

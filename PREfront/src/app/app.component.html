@@ -1,72 +1,137 @@
+<div *ngIf="authService.isAuthenticated()" class="main-wrapper" id="mainWrapper">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-mortarboard-fill me-2"></i>
+                    Colegio La PRE
+                </h5>
+            </div>
+            <button class="sidebar-close d-lg-none" id="sidebarClose">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="menu-section">
+                <div class="menu-section-title">Principal</div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a routerLink="/home" routerLinkActive="active" class="nav-link">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span>Inicio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a routerLink="/asistencia-qr" routerLinkActive="active" class="nav-link">
+                            <i class="bi bi-qr-code"></i>
+                            <span>Escanear QR</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a routerLink="/alumnos" routerLinkActive="active" class="nav-link">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Alumnos</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-section-title">Gestión de Matrículas</div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link has-submenu" href="javascript:void(0)" data-bs-toggle="collapse"
+                            data-bs-target="#matriculasSubmenu">
+                            <i class="bi bi-card-list"></i>
+                            <span>Matrículas</span>
+                        </a>
+                        <ul id="matriculasSubmenu" class="submenu collapse list-unstyled">
+                            <li><a routerLink="/matriculas" class="nav-link">Ver Matrículas</a></li>
+                            <li><a routerLink="/matriculas/nueva" class="nav-link">Nueva Matrícula</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+
+        <nav class="navbar top-navbar mb-4" style="background-color: #006DF0; padding: 10px 20px;">
+            <div class="container-fluid d-flex align-items-center h-100">
+
+                <button class="btn btn-link text-white p-0 me-3" id="sidebarToggle"
+                    style="font-size: 24px; text-decoration: none;">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <nav aria-label="breadcrumb" class="d-none d-lg-block ms-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a routerLink="/home"
+                                class="text-white text-decoration-none">Home</a></li>
+                    </ol>
+                </nav>
+
+                <div class="flex-grow-1"></div>
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <div class="dropdown">
+                        <button class="btn btn-link text-white position-relative" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-bell fs-5"></i>
+
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li>
+                                <h6 class="dropdown-header">Notificaciones</h6>
+                            </li>
+                            <li><a class="dropdown-item" href="#">Ver Notas</a></li>
+                            <li><a class="dropdown-item" href="#">Ver Asistencia</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown ms-2">
+                        <button
+                            class="btn btn-link text-white d-flex align-items-center text-decoration-none dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar me-2">
+                                <img src="https://ui-avatars.com/api/?name=Admin+Pre&background=fff&color=006DF0&size=32"
+                                    alt="Admin" class="rounded-circle" width="32" height="32">
+                            </div>
+                            <span class="d-none d-md-inline fw-bold">Administrador</span>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configuración</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" (click)="authService.logout()"
+                                    style="cursor: pointer;">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Salir
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid px-4">
+            <router-outlet></router-outlet>
+        </div>
+
+    </main>
+
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+</div>
+
 <ng-container *ngIf="!authService.isAuthenticated()">
     <router-outlet></router-outlet>
 </ng-container>
-
-<div *ngIf="authService.isAuthenticated()">
-
-    <div class="sidebar shadow-lg">
-
-        <div class="sidebar-header">
-            <h4 class="fw-bold mb-0">🏫 Colegio La PRE</h4>
-            <small style="color: #bbdefb;">Sistema Académico</small>
-        </div>
-
-        <ul class="nav flex-column mt-4">
-            <li class="nav-item">
-                <a routerLink="/asistencia-qr" routerLinkActive="active" class="nav-link">
-                    <i class="bi bi-qr-code me-3"></i> Escanear QR
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a routerLink="/alumnos" routerLinkActive="active" class="nav-link">
-                    <i class="bi bi-people-fill me-3"></i> Alumnos
-                </a>
-            </li>
-
-            <li class="nav-item mt-3 mb-1">
-                <span class="text-uppercase small fw-bold px-3"
-                    style="color: #90caf9; letter-spacing: 1px; font-size: 0.70rem;">
-                    Gestión de Matrículas
-                </span>
-            </li>
-
-            <li class="nav-item">
-                <a routerLink="/matriculas" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
-                    class="nav-link">
-                    <i class="bi bi-card-list me-3"></i> Ver Matrículas
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a routerLink="/matriculas/nueva" routerLinkActive="active" class="nav-link">
-                    <i class="bi bi-journal-plus me-3"></i> Nueva Matrícula
-                </a>
-            </li>
-
-            <li class="nav-item mt-4 mb-2">
-                <span class="text-uppercase small fw-bold px-3"
-                    style="color: #90caf9; letter-spacing: 1px; font-size: 0.75rem;">
-                    Administración
-                </span>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link disabled-link" title="Próximamente">
-                    <i class="bi bi-calendar-event me-3"></i> Periodos
-                </a>
-            </li>
-
-            <li class="nav-item mt-auto pt-5">
-                <a (click)="logout()" class="nav-link cursor-pointer" style="color: #ffcdd2 !important;">
-                    <i class="bi bi-box-arrow-left me-3"></i> Cerrar Sesión
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <div class="content-area">
-        <router-outlet></router-outlet>
-    </div>
-
-</div>

@@ -7,11 +7,13 @@ import { MatriculaFormComponent } from './components/matricula-form/matricula-fo
 import { MatriculaListComponent } from './components/matricula-list/matricula-list.component';
 import { AsistentiaQrComponent } from './components/asistencia-qr/asistentcia-qr.component';
 import { CarnetDigitalComponent } from './components/carnet-digital/carnet-digital.component';
+import { HomeComponent } from './components/home/home.component';
 
 export const routes: Routes = [
 
-    { path: '', redirectTo: '/alumnos', pathMatch: 'full' },
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'login', component: LoginComponent },
+    { path: 'home', component: HomeComponent, canActivate: [authGuard] },
     { path: 'asistencia-qr', component: AsistentiaQrComponent, canActivate: [authGuard] },
     { path: 'carnet-digital', component: CarnetDigitalComponent, canActivate: [authGuard] },
     { path: 'alumnos', component: AlumnoListComponent, canActivate: [authGuard] },

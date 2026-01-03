@@ -35,7 +35,7 @@ app.use('/api/cursos', cursoRoutes);
 app.use('/api/secciones', seccionRoutes);
 app.use('/api/periodos', periodoRoutes);
 app.use('/api/matriculas', matriculaRoutes);
-app.use('/api/asistencia', asistenciaRoutes);
+app.use('/api/asistencias', asistenciaRoutes);
 app.use('/api/usuarioRol', usuarioRolRoutes);
 app.use('/api/rol', rolRoutes);
 app.use('/api/asignacionCurso', asignacionCursoRoutes);

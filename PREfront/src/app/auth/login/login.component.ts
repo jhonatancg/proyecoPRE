@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router'; // Agregué RouterModule
-import { AuthService } from '../../services/auth.service';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service'; // Asegúrate que la ruta sea correcta
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,10 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading: boolean = false;
   error: string = '';
-  returnUrl: string = '/alumnos'; // Ruta por defecto tras loguearse
+  returnUrl: string = '/home';
+
+  // NUEVO: Variable para controlar la visibilidad de la contraseña
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -23,22 +26,22 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    // Definimos el formulario con 'usuario' en lugar de 'email'
     this.loginForm = this.fb.group({
       usuario: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(4)]] // Bajé el mínimo a 4 por si acaso
+      password: ['', [Validators.required, Validators.minLength(4)]]
     });
   }
 
   ngOnInit(): void {
-    // 1. Obtener la URL a la que el usuario quería ir antes de que lo mandaran al login
-    // Si no hay ninguna, vamos a '/alumnos'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/alumnos';
-
-    // 2. Si ya está logueado, no dejarlo ver el login y mandarlo adentro
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
     }
+  }
+
+  // NUEVO: Función para alternar el tipo de input (password/text)
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {
@@ -50,18 +53,14 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
-    // Enviamos { usuario, password }
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         if (response.success) {
-          // Si el login es correcto, el AuthService ya guardó el token.
-          // Nosotros solo redirigimos.
           this.router.navigate([this.returnUrl]);
         }
       },
       error: (err) => {
-        // Manejamos el error que viene del backend
-        this.error = err.error?.mensaje || 'Error al iniciar sesión, intente nuevamente.';
+        this.error = err.error?.mensaje || 'Error al iniciar sesión, verifique sus credenciales.';
         this.loading = false;
       },
       complete: () => {
@@ -70,24 +69,19 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Helper para saber si un campo tiene error visual
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  // Mensajes de error dinámicos
   getErrorMessage(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
-
     if (field?.hasError('required')) {
       return 'Este campo es obligatorio';
     }
-
     if (fieldName === 'password' && field?.hasError('minlength')) {
-      return 'La contraseña debe tener al menos 4 caracteres';
+      return 'Mínimo 4 caracteres';
     }
-
     return '';
   }
 }

@@ -1,1 +1,195 @@
-/* You can add global styles to this file, and also import other style files */
+/* ======================================================== */
+/* NUEVA PALETA DE COLORES INSTITUCIONAL "LA PRE" */
+/* ======================================================== */
+
+:root {
+    /* --- Definición de Colores --- */
+
+    /* 1. Color Principal (Azul del Escudo y Texto "LA PRE") */
+    /* Usado para: Barra lateral, Barra superior, Títulos principales */
+    --primary-color: #1a237e;
+    /* Azul marino profundo y elegante */
+    --primary-color-light: #283593;
+    /* Una versión un poco más clara para hovers */
+
+    /* 2. Color Secundario (Rojo Inferior del Escudo) */
+    /* Usado para: Botones de acción, Elemento de menú activo, Alertas */
+    --secondary-color: #d50000;
+    /* Rojo intenso y vibrante */
+    --secondary-color-hover: #b71c1c;
+    /* Rojo más oscuro para el efecto hover */
+
+    /* 3. Color de Acento (Amarillo del Engranaje y Borde) */
+    /* Usado para: Detalles finos, íconos sobre fondo oscuro, bordes de realce */
+    --accent-color: #ffd600;
+    /* Amarillo oro brillante */
+
+    /* 4. Colores Neutros y Fondos */
+    --bg-body: #f5f7fa;
+    /* Gris muy claro para el fondo del contenido */
+    --bg-white: #ffffff;
+    /* Blanco puro para tarjetas y barras */
+    --text-dark: #263238;
+    /* Gris oscuro para texto principal (mejor que negro puro) */
+    --text-muted: #546e7a;
+    /* Gris medio para subtítulos */
+    --text-light: #ffffff;
+    /* Blanco para texto sobre fondos oscuros */
+    --border-light: #eceff1;
+    /* Color suave para bordes de separación */
+}
+
+/* ======================================================== */
+/* APLICACIÓN GLOBAL DE LOS NUEVOS COLORES */
+/* ======================================================== */
+
+/* 1. Barra Lateral (Sidebar) */
+.sidebar,
+#sidebar {
+    background-color: var(--primary-color) !important;
+    /* Azul institucional */
+    background-image: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+    /* Degradado sutil */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .sidebar-header {
+    background-color: rgba(0, 0, 0, 0.1);
+    /* Oscurecer ligeramente el header del sidebar */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    /* Blanco con transparencia */
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    /* Preparar borde para el estado activo */
+}
+
+.sidebar .nav-link:hover {
+    color: var(--text-light) !important;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Elemento de menú activo: Usa el Rojo Secundario y Borde Amarillo */
+.sidebar .nav-link.active {
+    color: var(--text-light) !important;
+    background-color: var(--secondary-color) !important;
+    /* Rojo vibrante */
+    border-left-color: var(--accent-color);
+    /* Borde amarillo de acento */
+    font-weight: 600;
+}
+
+.sidebar .nav-link i {
+    color: var(--accent-color) !important;
+    /* Íconos en amarillo para que resalten */
+}
+
+.sidebar .nav-link.active i {
+    color: var(--text-light) !important;
+    /* Ícono blanco cuando está activo */
+}
+
+
+/* 2. Barra Superior (Header/Navbar) */
+.top-navbar,
+.navbar.fixed-top {
+    background-color: var(--primary-color) !important;
+    /* Mismo azul que el sidebar para continuidad */
+    color: var(--text-light) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* Opcional: Una línea amarilla delgada en la parte inferior */
+    border-bottom: 2px solid var(--accent-color) !important;
+}
+
+.top-navbar .btn-link,
+.top-navbar .nav-link,
+.top-navbar .navbar-brand {
+    color: var(--text-light) !important;
+}
+
+/* Migas de pan (Breadcrumb) en el header */
+.breadcrumb-item a {
+    color: var(--accent-color) !important;
+    /* Enlaces en amarillo para contraste */
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+
+/* 3. Fondo y Textos Generales */
+body,
+.dashboard-content,
+.main-wrapper {
+    background-color: var(--bg-body) !important;
+    color: var(--text-dark);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+    color: var(--primary-color);
+    /* Títulos en azul institucional */
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+
+/* 4. Botones y Elementos Interactivos */
+
+/* Botones Principales (Ej. "Guardar", "Iniciar Sesión") - Usan el Rojo */
+.btn-primary {
+    background-color: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+    color: var(--text-light) !important;
+    font-weight: 500;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--secondary-color-hover) !important;
+    border-color: var(--secondary-color-hover) !important;
+}
+
+/* Botones Secundarios (Ej. "Cancelar") - Usan el Azul */
+.btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color) !important;
+    color: var(--text-light) !important;
+}
+
+/* Badges y Notificaciones (Ej. el "3" rojo en el header) */
+.badge.bg-danger {
+    background-color: var(--secondary-color) !important;
+    /* Ahora usa el rojo oficial */
+}
+
+/* Tarjetas (Cards) */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    background-color: var(--bg-white);
+}
