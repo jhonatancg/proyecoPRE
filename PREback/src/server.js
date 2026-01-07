@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
     })
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`)
-    console.log(`📚 Documentación Swagger en http://localhost:${PORT}/api-docs`);
-})
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+    console.log(`📚 Swagger: http://192.168.18.26:${PORT}/api-docs`);
+});

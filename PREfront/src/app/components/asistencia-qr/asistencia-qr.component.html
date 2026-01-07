@@ -1,16 +1,19 @@
 <div class="qr-container">
-    <div class="row h-100">
+    <div class="row h-100 m-0">
 
-        <!-- CÁMARA -->
         <div class="col-md-7 d-flex flex-column align-items-center justify-content-center p-4">
 
             <h2 class="fw-bold text-primary mb-3">📍 Control de Asistencia</h2>
 
             <div class="camera-frame shadow-lg">
 
-                <!-- Capa negra -->
                 <div class="camera-overlay" *ngIf="!cameraActiva">
                     <span>CÁMARA APAGADA</span>
+                </div>
+
+                <div class="camera-overlay loading-overlay" *ngIf="cameraActiva && action.isLoading">
+                    <div class="spinner-border text-light" role="status"></div>
+                    <span class="ms-2">Iniciando...</span>
                 </div>
 
                 <ngx-scanner-qrcode #action="scanner" (event)="onEvent($event)" [isBeep]="false">
@@ -18,20 +21,24 @@
             </div>
 
             <div class="status-card mt-4 shadow-sm" [ngClass]="{
-          'bg-info': tipoMensaje === 'info',
-          'bg-success': tipoMensaje === 'success',
-          'bg-danger': tipoMensaje === 'error'
-        }">
-                <h3 class="text-white text-center m-0 py-3">
+                  'bg-info': tipoMensaje === 'info',
+                  'bg-success': tipoMensaje === 'success',
+                  'bg-danger': tipoMensaje === 'error'
+                }">
+                <h3 class="text-white text-center m-0 py-3 fs-5">
                     {{ mensaje }}
                 </h3>
             </div>
 
-            <!-- BOTONES -->
-            <div class="mt-4 d-flex gap-2">
+            <div class="mt-4 d-flex gap-2 flex-wrap justify-content-center">
+
                 <button class="btn btn-outline-primary" (click)="toggleCamera()">
                     <i class="bi bi-camera-video"></i>
-                    {{ cameraActiva ? 'Apagar Cámara' : 'Encender Cámara' }}
+                    {{ cameraActiva ? 'Apagar' : 'Encender' }}
+                </button>
+
+                <button class="btn btn-outline-secondary" (click)="cambiarCamara()" [disabled]="cameras.length <= 1">
+                    <i class="bi bi-arrow-repeat"></i> Cambiar
                 </button>
 
                 <button class="btn btn-outline-danger" (click)="salir()">
@@ -40,7 +47,6 @@
             </div>
         </div>
 
-        <!-- REGISTROS -->
         <div class="col-md-5 bg-white p-4 shadow-start scrollable-list">
             <h4 class="text-muted mb-4 border-bottom pb-2">Últimos Registros</h4>
 
@@ -59,9 +65,9 @@
                         <small class="text-muted">{{ reg.hora }}</small>
                     </div>
                     <span class="badge" [ngClass]="{
-              'bg-success': reg.situacion === 'PUNTUAL',
-              'bg-warning text-dark': reg.situacion === 'TARDE'
-            }">
+                          'bg-success': reg.situacion === 'PUNTUAL',
+                          'bg-warning text-dark': reg.situacion === 'TARDE'
+                        }">
                         {{ reg.situacion }}
                     </span>
                 </div>

@@ -5,21 +5,33 @@
 }
 
 .camera-frame {
-    width: 400px;
+    width: 100%;
+    max-width: 450px;
     height: 400px;
+    /* Altura fija */
     background: black;
     border-radius: 20px;
     overflow: hidden;
     border: 5px solid #fff;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Capa negra cuando la cámara está apagada */
+/* Forzar que el video del scanner llene el contenedor */
+::ng-deep .ngx-scanner-qrcode-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Capa negra de estado */
 .camera-overlay {
     position: absolute;
     inset: 0;
-    background: #000;
-    z-index: 10;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 20;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,12 +39,20 @@
     font-weight: bold;
     letter-spacing: 1px;
     font-size: 0.9rem;
+    flex-direction: column;
+}
+
+/* Overlay específico de carga */
+.loading-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 30;
 }
 
 .status-card {
     width: 100%;
     max-width: 500px;
     border-radius: 12px;
+    transition: background-color 0.3s ease;
 }
 
 .avatar-circle {
@@ -45,6 +65,7 @@
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    text-transform: uppercase;
 }
 
 .scrollable-list {
@@ -53,6 +74,7 @@
     border-left: 1px solid #e0e0e0;
 }
 
+/* Animación de entrada */
 .animate__fadeInLeft {
     animation: fadeInLeft 0.4s ease-out;
 }
