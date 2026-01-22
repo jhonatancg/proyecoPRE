@@ -17,7 +17,6 @@ export interface LoginResponse {
     usuario: Usuario;
 }
 
-// Usamos esto para respuestas genéricas
 export interface AuthResponse {
     success: boolean;
     mensaje: string;

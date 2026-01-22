@@ -21,7 +21,6 @@ export class MatriculaFormComponent implements OnInit {
   matriculaForm: FormGroup;
   loading: boolean = false;
 
-  // Listas para llenar los <select>
   alumnos: Alumno[] = [];
   secciones: Seccion[] = [];
   periodos: Periodo[] = [];
@@ -48,19 +47,17 @@ export class MatriculaFormComponent implements OnInit {
 
   cargarListasDesplegables(): void {
     console.log('--- INICIANDO CARGA DE DATOS ---');
-    // 1. Cargar Alumnos
+
     this.alumnoService.obtenerAlumnos().subscribe({
       next: (res: any) => this.alumnos = res.data || res,
       error: (err) => console.error('Error cargando alumnos', err)
     });
 
-    // 2. Cargar Periodos
     this.periodoService.obtenerPeriodos().subscribe({
       next: (res: any) => this.periodos = res.data || res,
       error: (err) => console.error('Error cargando periodos', err)
     });
 
-    // 3. Cargar Secciones
     this.seccionService.obtenerSecciones().subscribe({
       next: (res: any) => this.secciones = res.data || res,
       error: (err) => console.error('Error cargando secciones', err)
@@ -75,7 +72,6 @@ export class MatriculaFormComponent implements OnInit {
 
     this.loading = true;
 
-    // Convertimos los IDs a números por seguridad
     const datosGuardar = {
       ...this.matriculaForm.value,
       alumno_id: Number(this.matriculaForm.value.alumno_id),
@@ -85,7 +81,6 @@ export class MatriculaFormComponent implements OnInit {
 
     this.matriculaService.crearMatricula(datosGuardar).subscribe({
       next: (res) => {
-        // Redirigir a la lista de matrículas tras guardar
         this.router.navigate(['/matriculas']);
       },
       error: (err) => {

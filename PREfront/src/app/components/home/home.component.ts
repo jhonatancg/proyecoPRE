@@ -13,7 +13,6 @@ import { AuthService } from '../../services/auth.service';
 export class HomeComponent {
   title = 'Colegio La PRE';
 
-  // Inyectamos el AuthService y el Router
   constructor(public authService: AuthService, private router: Router) { }
 
   logout() {

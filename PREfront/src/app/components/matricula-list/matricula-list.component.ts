@@ -26,7 +26,6 @@ export class MatriculaListComponent implements OnInit {
     this.loading = true;
     this.matriculaService.obtenerMatriculas().subscribe({
       next: (res: any) => {
-        // Tu backend devuelve { success: true, data: [...] }
         this.matriculas = res.data || res;
         this.loading = false;
       },
@@ -41,7 +40,6 @@ export class MatriculaListComponent implements OnInit {
     if (confirm('¿Estás seguro de anular esta matrícula? El alumno perderá su vacante.')) {
       this.matriculaService.eliminarMatricula(id).subscribe({
         next: () => {
-          // Recargamos la lista para ver el cambio
           this.cargarMatriculas();
         },
         error: (err) => alert('Error al eliminar matrícula')

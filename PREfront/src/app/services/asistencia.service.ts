@@ -12,7 +12,6 @@ export class AsistenciaService {
 
   constructor(private http: HttpClient) { }
 
-  // Enviar el DNI escaneado
   registrarAsistencia(dni: string): Observable<AsistenciaResponse> {
     return this.http.post<AsistenciaResponse>(this.apiUrl, { dni });
   }

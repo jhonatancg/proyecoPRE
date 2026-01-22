@@ -38,7 +38,7 @@ const registrarAsistencia = async (req, res) => {
 
         const ahora = new Date();
         const horaLimite = new Date();
-        horaLimite.setHours(7, 15, 0);
+        horaLimite.setHours(19, 15, 0);
 
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
 

@@ -95,7 +95,6 @@ export class AsistentiaQrComponent implements AfterViewInit, OnDestroy {
   onEvent(e: any): void {
     if (!this.cameraActiva || this.procesando) return;
 
-    // Verificar si hay datos escaneados
     if (e && e.length > 0 && e[0].value) {
       const codigoQR = e[0].value;
       this.procesarAsistencia(codigoQR);
@@ -146,7 +145,7 @@ export class AsistentiaQrComponent implements AfterViewInit, OnDestroy {
 
     if (this.cameraActiva) {
       this.mensaje = 'Escanea el QR del alumno';
-      this.action.play(); // Reanuda el escaneo
+      this.action.play();
     }
   }
 
@@ -154,12 +153,11 @@ export class AsistentiaQrComponent implements AfterViewInit, OnDestroy {
     if (this.cameraActiva) {
       this.apagarCamara();
     } else {
-      // Encender
       this.cameraActiva = true;
       this.mensaje = 'Escanea el QR del alumno';
       this.tipoMensaje = 'info';
 
-      this.action.start(); // Asegura que el servicio inicie
+      this.action.start();
 
       if (this.deviceSelected) {
         this.action.playDevice(this.deviceSelected.deviceId);
@@ -182,7 +180,7 @@ export class AsistentiaQrComponent implements AfterViewInit, OnDestroy {
   cambiarCamara() {
     if (this.cameras.length <= 1) return;
 
-    // Pausar visualmente mientras cambiamos
+
     this.action.pause();
 
     // Calcular siguiente índice

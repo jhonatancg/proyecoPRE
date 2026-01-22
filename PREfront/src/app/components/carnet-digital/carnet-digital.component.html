@@ -39,8 +39,12 @@
     </div>
 
     <div class="actions mt-4 d-print-none text-center">
-        <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="imprimirCarnet()">
-            <i class="bi bi-printer-fill me-2"></i> Imprimir Carnet
+        <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="imprimirCarnet()"
+            [disabled]="generandoPDF">
+
+            <i class="bi me-2" [ngClass]="generandoPDF ? 'bi-hourglass-split' : 'bi-file-earmark-pdf-fill'"></i>
+            {{ generandoPDF ? 'Generando PDF...' : 'Descargar Carnet PDF' }}
+
         </button>
     </div>
 
