@@ -7,7 +7,20 @@
                 <p class="text-muted">Gestión escolar y matrículas</p>
             </div>
 
-            <div class="buttons-section">
+            <div class="buttons-section d-flex gap-2">
+                <button class="btn btn-outline-primary fw-bold" (click)="descargarTodosLosCarnets()"
+                    [disabled]="generandoMasivo || alumnos.length === 0">
+
+                    <span *ngIf="!generandoMasivo">
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Descargar Carnets
+                    </span>
+
+                    <span *ngIf="generandoMasivo">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        {{ progresoMasivo }}
+                    </span>
+                </button>
+
                 <a routerLink="/alumnos/nuevo" class="btn-academic btn-create">
                     <i class="bi bi-person-plus-fill"></i> Nuevo Alumno
                 </a>
@@ -112,4 +125,14 @@
 
         </div>
     </div>
+</div>
+
+<div id="contenedor-carnets-masivos" style="position: absolute; left: -9999px; top: 0; width: 350px;">
+
+    <div *ngFor="let alumno of alumnos" style="margin-bottom: 20px;">
+
+        <app-carnet-digital [alumno]="alumno" [ocultarAcciones]="true"></app-carnet-digital>
+
+    </div>
+
 </div>

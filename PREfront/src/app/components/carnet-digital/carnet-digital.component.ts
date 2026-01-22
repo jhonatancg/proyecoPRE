@@ -14,6 +14,7 @@ import html2canvas from 'html2canvas';
 })
 export class CarnetDigitalComponent implements OnChanges {
   @Input() alumno: any = null;
+  @Input() ocultarAcciones: boolean = false;
 
   generandoPDF: boolean = false;
 
