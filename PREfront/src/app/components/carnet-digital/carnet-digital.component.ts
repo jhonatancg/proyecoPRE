@@ -52,48 +52,43 @@ export class CarnetDigitalComponent implements OnChanges {
   imprimirCarnet() {
     this.generandoPDF = true; // Activar estado de carga
 
-    // Buscamos el elemento HTML por su ID (Asegúrate de tener id="carnetImprimir" en tu HTML)
     const data = document.getElementById('carnetImprimir');
 
     if (data) {
-      // html2canvas toma una "captura" del div
       html2canvas(data, {
-        scale: 3, // Aumentamos la escala para mejor calidad de impresión (evita QR borroso)
-        useCORS: true // Permite cargar imágenes externas si las hubiera
+        scale: 4, // Alta calidad
+        useCORS: true
       }).then(canvas => {
 
-        // Configuramos las dimensiones
-        const imgWidth = 85; // Ancho estándar tarjeta (mm)
-        const pageHeight = 297; // Altura A4 (mm)
-        const pageWidth = 210;  // Ancho A4 (mm)
+        // --- 1. CONFIGURACIÓN DE MEDIDAS (11cm x 17.5cm) ---
+        const imgWidth = 110;  // 110mm (11cm) Ancho
+        const imgHeight = 175; // 175mm (17.5cm) Alto
 
-        // Calculamos la altura proporcional de la imagen basada en el canvas
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // --- 2. CONFIGURAR PDF EN HORIZONTAL ('l' = landscape) ---
+        const pdf = new jsPDF('l', 'mm', 'a4');
 
-        // Posición para centrar en la hoja A4
-        const positionX = (pageWidth - imgWidth) / 2;
-        const positionY = 20; // Margen superior
+        // --- 3. POSICIÓN "A UN COSTADO" ---
+        const positionX = 15; // 15mm desde la izquierda
+        const positionY = 15; // 15mm desde arriba
 
         const contentDataURL = canvas.toDataURL('image/png');
 
-        // Creamos el PDF (orientación vertical 'p', unidad 'mm', formato 'a4')
-        const pdf = new jsPDF('p', 'mm', 'a4');
-
-        // Agregamos la imagen al PDF
+        // Agregamos la imagen con las medidas y posición forzadas
         pdf.addImage(contentDataURL, 'PNG', positionX, positionY, imgWidth, imgHeight);
 
-        // Guardamos el archivo con el nombre del alumno
-        const nombreArchivo = `Carnet_${this.alumno.nombres || 'Nombres'}_${this.alumno.apellidos || 'Apellidos'}.pdf`;
+        // Guardamos el archivo
+        const nombreArchivo = `Carnet_${this.alumno.nombres || 'Alumno'}.pdf`;
         pdf.save(nombreArchivo);
 
-        this.generandoPDF = false; // Terminar estado de carga
+        this.generandoPDF = false;
       }).catch(err => {
         console.error("Error al generar PDF", err);
         this.generandoPDF = false;
       });
     } else {
-      console.error("No se encontró el elemento HTML con id 'carnetImprimir'");
+      console.error("No se encontró el ID 'carnetImprimir'");
       this.generandoPDF = false;
     }
   }
+
 }

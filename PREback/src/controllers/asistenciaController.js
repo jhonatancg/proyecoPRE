@@ -54,7 +54,7 @@ const registrarAsistencia = async (req, res) => {
 
         if (alumno.cel_apoderado) {
             const icono = situacionFinal === 'PUNTUAL' ? '✅' : '⚠️';
-            const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha ingresado al colegio.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*`;
+            const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*`;
 
             // Enviamos sin await para no demorar la respuesta al frontend
             enviarMensaje(alumno.cel_apoderado, textoMensaje);

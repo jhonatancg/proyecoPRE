@@ -147,4 +147,11 @@
     cursor: pointer;
     position: relative;
     z-index: 10070;
+
+    background-color: #ffffff;
+    /* fondo blanco REAL */
+    opacity: 1;
+
+    /* Solo la X roja */
+    filter: invert(18%) sepia(90%) saturate(7000%) hue-rotate(350deg) brightness(95%) contrast(110%);
 }

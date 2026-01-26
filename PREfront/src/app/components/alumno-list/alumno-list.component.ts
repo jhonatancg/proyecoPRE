@@ -82,25 +82,25 @@ export class AlumnoListComponent implements OnInit {
     this.generandoMasivo = true;
     this.progresoMasivo = 'Iniciando generación...';
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = 210;
-    const pageHeight = 297;
+    // 1. CAMBIO A HORIZONTAL ('l' = landscape)
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    const pageWidth = 297; // Ancho de A4 Horizontal
+    const pageHeight = 210; // Alto de A4 Horizontal
 
-    // Configuración de la cuadrícula
-    const cardWidth = 85;  // Ancho tarjeta
-    const cardHeight = 130; // Altura estimada (ajustar según tu diseño real)
-    const marginX = (pageWidth - (cardWidth * 2)) / 3; // Margen para centrar horizontalmente
-    const marginY = 15; // Margen superior inicial
+    // 2. NUEVAS MEDIDAS (11cm x 17.5cm)
+    const cardWidth = 110;  // 110mm ancho
+    const cardHeight = 175; // 175mm alto
 
-    // Coordenadas para 4 tarjetas: [x, y]
+    // Cálculo de márgenes para centrar 2 carnets
+    const marginX = (pageWidth - (cardWidth * 2)) / 3; // Espaciado equitativo
+    const marginY = 15; // Margen superior (quedan aprox 20mm abajo)
+
+    // 3. SOLO 2 POSICIONES (Izquierda y Derecha)
     const posiciones = [
-      [marginX, marginY],                               // Arriba Izquierda
-      [marginX * 2 + cardWidth, marginY],               // Arriba Derecha
-      [marginX, marginY + cardHeight + 10],             // Abajo Izquierda
-      [marginX * 2 + cardWidth, marginY + cardHeight + 10] // Abajo Derecha
+      [marginX, marginY],                           // Posición 1 (Izquierda)
+      [marginX * 2 + cardWidth, marginY]            // Posición 2 (Derecha)
     ];
 
-    // Obtenemos el contenedor oculto que tiene todos los carnets
     const container = document.getElementById('contenedor-carnets-masivos');
     if (!container) {
       console.error('No se encontró el contenedor masivo');
@@ -108,37 +108,30 @@ export class AlumnoListComponent implements OnInit {
       return;
     }
 
-    // Obtenemos los hijos (cada carnet individual)
     const cards = container.children;
-    let cardsInPage = 0; // Contador para saber cuándo crear nueva página
+    let cardsInPage = 0;
 
     for (let i = 0; i < this.alumnos.length; i++) {
       this.progresoMasivo = `Procesando ${i + 1} de ${this.alumnos.length}...`;
 
-      // Obtener el elemento DOM del carnet específico
-      // Nota: El primer hijo suele ser el 'carnet-container' gracias al selector de componente
       const element = cards[i] as HTMLElement;
 
-      // Capturar imagen
       try {
-        const canvas = await html2canvas(element, { scale: 2, logging: false, useCORS: true });
+        // Aumentamos escala a 3 o 4 para mejor calidad en tamaño grande
+        const canvas = await html2canvas(element, { scale: 3, logging: false, useCORS: true });
         const imgData = canvas.toDataURL('image/png');
 
-        // Calcular posición
-        const posIndex = cardsInPage % 4;
+        // Calcular posición (0 o 1)
+        const posIndex = cardsInPage % 2;
         const [x, y] = posiciones[posIndex];
 
-        // Si es el primer elemento de un bloque de 4 (y no es el absoluto primero), nueva página
-        if (cardsInPage > 0 && cardsInPage % 4 === 0) {
+        // 4. NUEVA PÁGINA CADA 2 CARNETS
+        if (cardsInPage > 0 && cardsInPage % 2 === 0) {
           pdf.addPage();
         }
 
-        // Agregar imagen al PDF
-        // Ajustamos la altura proporcionalmente para que no se deforme
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfH = (imgProps.height * cardWidth) / imgProps.width;
-
-        pdf.addImage(imgData, 'PNG', x, y, cardWidth, pdfH);
+        // Forzamos las medidas exactas (ancho y alto) para evitar deformaciones leves
+        pdf.addImage(imgData, 'PNG', x, y, cardWidth, cardHeight);
 
         cardsInPage++;
 
@@ -148,7 +141,7 @@ export class AlumnoListComponent implements OnInit {
     }
 
     this.progresoMasivo = 'Finalizando PDF...';
-    pdf.save('Carnets_Alumnos.pdf');
+    pdf.save('Carnets_Masivos_Alumnos.pdf');
     this.generandoMasivo = false;
   }
 }

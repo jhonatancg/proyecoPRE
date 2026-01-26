@@ -71,12 +71,13 @@
 
 /* Foto Circular */
 .photo-frame {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     background-color: #f5f9ff;
-    border: 5px solid white;
+    border: 2px solid white;
     border-radius: 50%;
     margin: 0 auto 10px auto;
+    transform: translateY(15px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -86,6 +87,7 @@
 }
 
 .student-name {
+    transform: translateY(10px);
     font-size: 1rem;
     font-weight: 400;
     color: #455a64;
@@ -111,6 +113,7 @@
     display: inline-block;
     font-weight: bold;
     font-size: 0.9rem;
+    transform: translateY(15px);
     margin-bottom: 10px;
 }
 
@@ -196,8 +199,8 @@
 
         /* Aseguramos que se vea */
         z-index: 999999 !important;
-        width: 320px !important;
-        height: 500px !important;
+        width: 11cm !important;
+        height: 17.5cm !important;
     }
 
     /* Asegurar que el modal no estorbe */
