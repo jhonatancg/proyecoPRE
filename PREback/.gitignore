@@ -1,3 +1,13 @@
 node_modules/
 .env
 .DS_Store
+
+# WhatsApp Web / Chrome / WebView
+.wwebjs_auth/
+**/Account Web Data
+**/*.dat
+**/*.pma
+**/BrowserMetrics*
+**/crl-set-*.data
+# Archivos temporales Chrome / WebView
+*.html

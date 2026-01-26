@@ -1,5 +1,7 @@
 const db = require('../config/database');
 
+const { enviarMensaje } = require('../services/whatsappService');
+
 const registrarAsistencia = async (req, res) => {
     try {
         const { dni } = req.body;
@@ -11,7 +13,7 @@ const registrarAsistencia = async (req, res) => {
             });
         }
         const [alumnoFound] = await db.query(
-            'SELECT id, nombres, apellidos FROM alumnos WHERE dni_ce = ? AND estado = 1',
+            'SELECT id, nombres, apellidos, cel_apoderado FROM alumnos WHERE dni_ce = ? AND estado = 1',
             [dni]
         );
         if (alumnoFound.length === 0) {
@@ -42,10 +44,21 @@ const registrarAsistencia = async (req, res) => {
 
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
 
+        const horaRegistro = ahora.toLocaleTimeString('es-PE', { hour12: false });
+        const fechaRegistro = ahora.toLocaleDateString('es-PE');
+
         const [resultado] = await db.query(
             'INSERT INTO asistencias (alumno_id, fecha, hora_entrada, situacion) VALUES (?, CURDATE(), CURTIME(), ?)',
             [alumno_id, situacionFinal]
         );
+
+        if (alumno.cel_apoderado) {
+            const icono = situacionFinal === 'PUNTUAL' ? '✅' : '⚠️';
+            const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha ingresado al colegio.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*`;
+
+            // Enviamos sin await para no demorar la respuesta al frontend
+            enviarMensaje(alumno.cel_apoderado, textoMensaje);
+        }
 
         res.status(201).json({
             success: true,
@@ -54,7 +67,7 @@ const registrarAsistencia = async (req, res) => {
                 id: resultado.insertId,
                 alumno: `${alumno.nombres} ${alumno.apellidos}`,
                 situacion: situacionFinal,
-                hora: new Date().toLocaleTimeString()
+                hora: horaRegistro
             }
         });
 

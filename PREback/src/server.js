@@ -20,6 +20,8 @@ const nivelCursoRoutes = require('./routes/nivelCursoRoutes');
 const evaluacionRoutes = require('./routes/evaluacionRoutes');
 const notasRoutes = require('./routes/notasRoutes');
 
+require('./services/whatsappService');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
