@@ -6,14 +6,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthService);
     const token = authService.getToken();
 
-    if (token) {
-        // Clonar la request y agregar el header de autorización
-        req = req.clone({
-            setHeaders: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-    }
+    // Clonamos la request SIEMPRE (tenga token o no)
+    req = req.clone({
+        setHeaders: {
+            // 1. HEADER OBLIGATORIO PARA QUE NGROK NO FALLE (Siempre)
+            'ngrok-skip-browser-warning': 'true',
+
+            // 2. Token de Autorización (Solo si existe)
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+    });
 
     return next(req);
 };
