@@ -26,7 +26,7 @@ export class AlumnoFormComponent implements OnInit {
       apellidos: ['', [Validators.required, Validators.minLength(3)]],
       dni_ce: ['', [Validators.required, Validators.minLength(3)]],
       genero: ['', [Validators.required]],
-      celular: ['', [Validators.required, Validators.minLength(3)]],
+      celular: [''],
       apoderado: ['', [Validators.required, Validators.minLength(3)]],
       cel_apoderado: ['', [Validators.required, Validators.minLength(3)]],
     })
