@@ -82,6 +82,10 @@ export class AlumnoListComponent implements OnInit {
     this.generandoMasivo = true;
     this.progresoMasivo = 'Iniciando generación...';
 
+    // Al usar JPEG y Escala 3, consumimos mucha menos memoria.
+    // Intentaremos generar todo en UN SOLO ARCHIVO. 
+    // (Si tienes más de 100 alumnos, avísame para activar el modo por lotes de nuevo).
+
     const pdf = new jsPDF('l', 'mm', 'a4');
 
     // --- MEDIDAS EXACTAS ---
@@ -99,38 +103,33 @@ export class AlumnoListComponent implements OnInit {
 
     const container = document.getElementById('contenedor-carnets-masivos');
     if (!container) {
-      console.error('No se encontró el contenedor masivo');
       this.generandoMasivo = false;
       return;
     }
-
-    const wrapperDivs = container.children; // Estos son los divs padres
+    const wrapperDivs = container.children;
     let cardsInPage = 0;
 
     for (let i = 0; i < this.alumnos.length; i++) {
       this.progresoMasivo = `Procesando ${i + 1} de ${this.alumnos.length}...`;
 
       const wrapper = wrapperDivs[i] as HTMLElement;
-
-      // === CORRECCIÓN CLAVE AQUÍ ===
-      // No capturamos el wrapper, buscamos el carnet exacto por su CLASE
-      // Asegúrate que tu div del carnet tenga la clase 'carnet-container'
       const carnetElement = wrapper.querySelector('.carnet-container') as HTMLElement;
 
-      if (!carnetElement) {
-        console.warn('No se encontró el carnet en el elemento ' + i);
-        continue;
-      }
+      if (!carnetElement) continue;
 
       try {
+        // === EL PUNTO DULCE DE CALIDAD ===
         const canvas = await html2canvas(carnetElement, {
-          scale: 4,
+          scale: 3,           // 3 es CALIDAD DE IMPRESIÓN (300 DPI aprox)
           logging: false,
           useCORS: true,
-          backgroundColor: null // Evita fondos blancos extraños
+          backgroundColor: null
         });
 
-        const imgData = canvas.toDataURL('image/png');
+        // === LA CLAVE DEL AHORRO DE MEMORIA ===
+        // Usamos JPEG al 90% (0.9). 
+        // Se ve nítido, pero pesa 10 veces menos que PNG.
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
 
         const posIndex = cardsInPage % 3;
         const [x, y] = posiciones[posIndex];
@@ -139,9 +138,13 @@ export class AlumnoListComponent implements OnInit {
           pdf.addPage();
         }
 
-        pdf.addImage(imgData, 'PNG', x, y, cardWidth, cardHeight);
+        // IMPORTANTE: Decirle al PDF que es JPEG
+        pdf.addImage(imgData, 'JPEG', x, y, cardWidth, cardHeight);
 
         cardsInPage++;
+
+        // Pequeña pausa para no bloquear la pantalla
+        if (i % 5 === 0) await new Promise(r => setTimeout(r, 20));
 
       } catch (e) {
         console.error(`Error procesando carnet ${i}`, e);
