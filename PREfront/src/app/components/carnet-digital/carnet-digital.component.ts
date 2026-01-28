@@ -60,9 +60,9 @@ export class CarnetDigitalComponent implements OnChanges {
         useCORS: true
       }).then(canvas => {
 
-        // --- 1. CONFIGURACIÓN DE MEDIDAS (11cm x 17.5cm) ---
-        const imgWidth = 110;  // 110mm (11cm) Ancho
-        const imgHeight = 175; // 175mm (17.5cm) Alto
+        // --- 1. CONFIGURACIÓN DE MEDIDAS 
+        const imgWidth = 98;  //  Ancho
+        const imgHeight = 155; //  Alto
 
         // --- 2. CONFIGURAR PDF EN HORIZONTAL ('l' = landscape) ---
         const pdf = new jsPDF('l', 'mm', 'a4');

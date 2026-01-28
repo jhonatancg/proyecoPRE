@@ -82,23 +82,19 @@ export class AlumnoListComponent implements OnInit {
     this.generandoMasivo = true;
     this.progresoMasivo = 'Iniciando generación...';
 
-    // 1. CAMBIO A HORIZONTAL ('l' = landscape)
     const pdf = new jsPDF('l', 'mm', 'a4');
-    const pageWidth = 297; // Ancho de A4 Horizontal
-    const pageHeight = 210; // Alto de A4 Horizontal
 
-    // 2. NUEVAS MEDIDAS (11cm x 17.5cm)
-    const cardWidth = 110;  // 110mm ancho
-    const cardHeight = 175; // 175mm alto
+    // --- MEDIDAS EXACTAS ---
+    const cardWidth = 98;
+    const cardHeight = 155;
+    const marginLeft = 1;
+    const gap = 0.5;
+    const marginY = 15;
 
-    // Cálculo de márgenes para centrar 2 carnets
-    const marginX = (pageWidth - (cardWidth * 2)) / 3; // Espaciado equitativo
-    const marginY = 15; // Margen superior (quedan aprox 20mm abajo)
-
-    // 3. SOLO 2 POSICIONES (Izquierda y Derecha)
     const posiciones = [
-      [marginX, marginY],                           // Posición 1 (Izquierda)
-      [marginX * 2 + cardWidth, marginY]            // Posición 2 (Derecha)
+      [marginLeft, marginY],
+      [marginLeft + cardWidth + gap, marginY],
+      [marginLeft + (cardWidth * 2) + (gap * 2), marginY]
     ];
 
     const container = document.getElementById('contenedor-carnets-masivos');
@@ -108,29 +104,41 @@ export class AlumnoListComponent implements OnInit {
       return;
     }
 
-    const cards = container.children;
+    const wrapperDivs = container.children; // Estos son los divs padres
     let cardsInPage = 0;
 
     for (let i = 0; i < this.alumnos.length; i++) {
       this.progresoMasivo = `Procesando ${i + 1} de ${this.alumnos.length}...`;
 
-      const element = cards[i] as HTMLElement;
+      const wrapper = wrapperDivs[i] as HTMLElement;
+
+      // === CORRECCIÓN CLAVE AQUÍ ===
+      // No capturamos el wrapper, buscamos el carnet exacto por su CLASE
+      // Asegúrate que tu div del carnet tenga la clase 'carnet-container'
+      const carnetElement = wrapper.querySelector('.carnet-container') as HTMLElement;
+
+      if (!carnetElement) {
+        console.warn('No se encontró el carnet en el elemento ' + i);
+        continue;
+      }
 
       try {
-        // Aumentamos escala a 3 o 4 para mejor calidad en tamaño grande
-        const canvas = await html2canvas(element, { scale: 3, logging: false, useCORS: true });
+        const canvas = await html2canvas(carnetElement, {
+          scale: 4,
+          logging: false,
+          useCORS: true,
+          backgroundColor: null // Evita fondos blancos extraños
+        });
+
         const imgData = canvas.toDataURL('image/png');
 
-        // Calcular posición (0 o 1)
-        const posIndex = cardsInPage % 2;
+        const posIndex = cardsInPage % 3;
         const [x, y] = posiciones[posIndex];
 
-        // 4. NUEVA PÁGINA CADA 2 CARNETS
-        if (cardsInPage > 0 && cardsInPage % 2 === 0) {
+        if (cardsInPage > 0 && cardsInPage % 3 === 0) {
           pdf.addPage();
         }
 
-        // Forzamos las medidas exactas (ancho y alto) para evitar deformaciones leves
         pdf.addImage(imgData, 'PNG', x, y, cardWidth, cardHeight);
 
         cardsInPage++;
