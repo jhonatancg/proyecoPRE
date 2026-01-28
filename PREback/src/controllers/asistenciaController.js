@@ -38,11 +38,21 @@ const registrarAsistencia = async (req, res) => {
             });
         }
 
+        // --- INICIO DE MODIFICACIÓN DE HORARIOS ---
         const ahora = new Date();
         const horaLimite = new Date();
-        horaLimite.setHours(19, 15, 0);
+
+        // Verificamos si es turno mañana (antes de las 12:00 PM) o tarde
+        if (ahora.getHours() < 12) {
+            // Horario Mañana: Límite 7:02 AM
+            horaLimite.setHours(7, 2, 0);
+        } else {
+            // Horario Tarde: Límite 4:10 PM (16:10)
+            horaLimite.setHours(16, 10, 0);
+        }
 
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
+        // --- FIN DE MODIFICACIÓN DE HORARIOS ---
 
         const horaRegistro = ahora.toLocaleTimeString('es-PE', { hour12: false });
         const fechaRegistro = ahora.toLocaleDateString('es-PE');
