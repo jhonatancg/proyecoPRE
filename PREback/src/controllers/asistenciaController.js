@@ -1,5 +1,4 @@
 const db = require('../config/database');
-
 const { enviarMensaje } = require('../services/whatsappService');
 
 const registrarAsistencia = async (req, res) => {
@@ -182,9 +181,79 @@ const eliminarAsistencia = async (req, res) => {
     }
 };
 
+// --- NUEVA FUNCIÓN PARA REENVIAR NOTIFICACIONES PENDIENTES ---
+const reenviarNotificacionesHoy = async (req, res) => {
+    try {
+        console.log('🔄 Iniciando reenvío masivo de notificaciones de HOY...');
+
+        // 1. Obtenemos todas las asistencias válidas de hoy
+        const [asistenciasHoy] = await db.query(`
+            SELECT 
+                a.id, 
+                a.hora_entrada, 
+                a.situacion, 
+                al.nombres, 
+                al.apellidos, 
+                al.cel_apoderado 
+            FROM asistencias a
+            INNER JOIN alumnos al ON a.alumno_id = al.id
+            WHERE a.fecha = CURDATE() AND a.estado = 1
+        `);
+
+        if (asistenciasHoy.length === 0) {
+            return res.json({ success: true, mensaje: 'No hay asistencias registradas hoy para reenviar.' });
+        }
+
+        let enviados = 0;
+        let errores = 0;
+        const fechaLegible = new Date().toLocaleDateString('es-PE');
+
+        // 2. Iteramos y enviamos con pausa de seguridad
+        for (const registro of asistenciasHoy) {
+
+            if (registro.cel_apoderado) {
+                const icono = registro.situacion === 'PUNTUAL' ? '✅' : '⚠️';
+                const horaLegible = registro.hora_entrada; // Usamos la hora que ya está en BD
+
+                const textoMensaje = `Hola, informamos que el alumno *${registro.nombres} ${registro.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
+
+                console.log(`📤 Reenviando a: ${registro.nombres} (${registro.cel_apoderado})...`);
+
+                // Enviar mensaje
+                const exito = await enviarMensaje(registro.cel_apoderado, textoMensaje);
+
+                if (exito) enviados++;
+                else errores++;
+
+                // ⚠️ PAUSA DE 2 SEGUNDOS para evitar bloqueo por spam
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+
+        res.json({
+            success: true,
+            mensaje: `Proceso finalizado. Se intentó notificar a ${asistenciasHoy.length} alumnos.`,
+            detalles: {
+                total_registros_hoy: asistenciasHoy.length,
+                mensajes_enviados: enviados,
+                mensajes_fallidos: errores
+            }
+        });
+
+    } catch (error) {
+        console.error('Error en reenvío masivo:', error);
+        res.status(500).json({
+            success: false,
+            mensaje: 'Error al procesar el reenvío',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     registrarAsistencia,
     obtenerAsistencias,
     obtenerAsistenciasHoy,
-    eliminarAsistencia
+    eliminarAsistencia,
+    reenviarNotificacionesHoy
 };

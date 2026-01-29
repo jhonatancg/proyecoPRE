@@ -5,7 +5,8 @@ const {
     registrarAsistencia,
     obtenerAsistencias,
     obtenerAsistenciasHoy,
-    eliminarAsistencia
+    eliminarAsistencia,
+    reenviarNotificacionesHoy
 } = require('../controllers/asistenciaController');
 
 const {
@@ -103,5 +104,6 @@ router.get('/hoy', verificarToken, obtenerAsistenciasHoy);
  *         description: Error interno del servidor
  */
 router.delete('/:id', verificarToken, eliminarAsistencia);
+router.get('/reenviar-hoy', reenviarNotificacionesHoy);
 
 module.exports = router;

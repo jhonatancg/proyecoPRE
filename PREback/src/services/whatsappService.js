@@ -1,45 +1,71 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
-// Inicializamos el cliente con estrategia de guardado de sesión
+console.log('Iniciando servicio de WhatsApp...');
+
+// VARIABLE DE CONTROL: Para evitar que el mensaje de éxito salga 3 veces
+let yaMostroMensaje = false;
+
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        args: ['--no-sandbox'] // Necesario si lo despliegas en Linux/Docker
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Estabilidad para Linux/Windows
+        headless: true // Sin navegador visual
     }
 });
 
-// Generar QR en la terminal para iniciar sesión
+// 1. Generación de QR
 client.on('qr', (qr) => {
-    console.log('ESCANEA ESTE QR CON TU WHATSAPP PARA CONECTAR EL BOT:');
+    // Si pide QR, reseteamos la bandera por si acaso
+    yaMostroMensaje = false;
+    console.log('------------------------------------------------');
+    console.log('ESCANEA ESTE QR CON TU WHATSAPP (Dispositivos Vinculados):');
     qrcode.generate(qr, { small: true });
+    console.log('------------------------------------------------');
 });
 
+// 2. Confirmación de Autenticación (CON FILTRO ANTI-REPETICIÓN)
+client.on('authenticated', () => {
+    if (!yaMostroMensaje) {
+        console.log('✅ QR Escaneado correctamente. Autenticación exitosa.');
+        yaMostroMensaje = true; // Marcamos como mostrado
+    }
+});
+
+// 3. Pantalla de carga (Bajando mensajes, contactos, etc.)
+client.on('loading_screen', (porcentaje, mensaje) => {
+    console.log(`⏳ Cargando WhatsApp: ${porcentaje}% - ${mensaje}`);
+});
+
+// 4. LISTO PARA USAR
 client.on('ready', () => {
-    console.log('✅ Cliente de WhatsApp listo y conectado!');
+    console.log('🚀 Cliente de WhatsApp listo para enviar mensajes!');
 });
 
+// 5. Errores y Desconexión
 client.on('auth_failure', msg => {
-    console.error('❌ Error de autenticación en WhatsApp:', msg);
+    console.error('❌ Error de autenticación:', msg);
+});
+
+client.on('disconnected', (reason) => {
+    console.log('⚠️ WhatsApp se desconectó. Razón:', reason);
+    yaMostroMensaje = false; // Reseteamos la bandera para cuando se reconecte
 });
 
 // Función para enviar mensaje
 const enviarMensaje = async (numero, texto) => {
     try {
-        // Formatear número: Perú es 51. WhatsApp Web usa formato: 51999999999@c.us
-        // Quitamos espacios o guiones si los hubiera
-        const numeroLimpio = numero.replace(/\D/g, '');
+        if (!numero) return false;
 
-        // Validar si tiene 9 dígitos (celular Perú)
-        if (numeroLimpio.length === 9) {
-            const chatId = `51${numeroLimpio}@c.us`;
-            await client.sendMessage(chatId, texto);
-            console.log(`📩 Mensaje enviado a ${numeroLimpio}`);
-            return true;
-        } else {
-            console.log(`⚠️ Número inválido: ${numero}`);
-            return false;
-        }
+        // Limpieza de número (Perú)
+        const numeroLimpio = numero.replace(/\D/g, '');
+        const chatId = `51${numeroLimpio}@c.us`;
+
+        // Intentamos enviar
+        await client.sendMessage(chatId, texto);
+        console.log(`📩 Mensaje enviado a ${numeroLimpio}`);
+        return true;
+
     } catch (error) {
         console.error('Error enviando WhatsApp:', error);
         return false;
