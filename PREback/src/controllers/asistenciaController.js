@@ -25,24 +25,37 @@ const registrarAsistencia = async (req, res) => {
         const alumno = alumnoFound[0];
         const alumno_id = alumno.id;
 
-        const [existe] = await db.query(
-            'SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1',
-            [alumno_id]
-        );
+        // --- CAMBIO AQUÍ: Definimos la hora actual ANTES de validar duplicados ---
+        const ahora = new Date();
+        const esTurnoManana = ahora.getHours() < 12;
+
+        let queryDuplicado = '';
+
+        // Validamos duplicado SEGÚN EL TURNO ACTUAL
+        if (esTurnoManana) {
+            // Si es de mañana, verificamos si ya tiene un registro antes de las 12:00
+            queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada < '12:00:00'";
+        } else {
+            // Si es de tarde, verificamos si ya tiene un registro después de las 12:00
+            queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada >= '12:00:00'";
+        }
+
+        const [existe] = await db.query(queryDuplicado, [alumno_id]);
 
         if (existe.length > 0) {
             return res.status(400).json({
                 success: false,
-                mensaje: `El alumno ${alumno.nombres} ya registró asistencia hoy.`
+                mensaje: `El alumno ${alumno.nombres} ya registró asistencia en el turno ${esTurnoManana ? 'MAÑANA' : 'TARDE'}.`
             });
         }
+        // --- FIN CAMBIO VALIDACIÓN ---
 
-        // --- INICIO DE MODIFICACIÓN DE HORARIOS ---
-        const ahora = new Date();
+
+        // --- LÓGICA DE HORARIOS Y TARDANZAS ---
         const horaLimite = new Date();
 
-        // Verificamos si es turno mañana (antes de las 12:00 PM) o tarde
-        if (ahora.getHours() < 12) {
+        // Verificamos si es turno mañana o tarde para definir el límite
+        if (esTurnoManana) {
             // Horario Mañana: Límite 7:02 AM
             horaLimite.setHours(7, 2, 0);
         } else {
@@ -51,7 +64,6 @@ const registrarAsistencia = async (req, res) => {
         }
 
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
-        // --- FIN DE MODIFICACIÓN DE HORARIOS ---
 
         const horaRegistro = ahora.toLocaleTimeString('es-PE', { hour12: false });
         const fechaRegistro = ahora.toLocaleDateString('es-PE');
