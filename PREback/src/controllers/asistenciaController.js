@@ -215,7 +215,7 @@ const reenviarNotificacionesHoy = async (req, res) => {
                 const icono = registro.situacion === 'PUNTUAL' ? '✅' : '⚠️';
                 const horaLegible = registro.hora_entrada; // Usamos la hora que ya está en BD
 
-                const textoMensaje = `Hola, informamos que el alumno *${registro.nombres} ${registro.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
+                const textoMensaje = `Hola, por problemas de red, recién se está enviando la notificación de asistencia. El alumno *${registro.nombres} ${registro.apellidos}* asistió con normalidad esta mañana.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
 
                 console.log(`📤 Reenviando a: ${registro.nombres} (${registro.cel_apoderado})...`);
 
