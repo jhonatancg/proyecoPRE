@@ -91,6 +91,18 @@
     background-color: #ffe0b2;
 }
 
+/* 🔵 BOTÓN AZUL PRINCIPAL (para btn btn-primary w-100 fw-bold) */
+.btn-primary-custom {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+    border: none;
+    color: white;
+}
+
+.btn-primary-custom:hover {
+    background: linear-gradient(45deg, var(--secondary-blue), var(--primary-blue));
+    color: white;
+}
+
 /* Modal */
 .modal.show {
     background-color: rgba(0, 0, 0, 0.5);
