@@ -109,10 +109,6 @@
     filter: brightness(0.95);
 }
 
-/* ================================================= */
-/* === SOLUCIÓN PARA QUE EL MODAL FUNCIONE (CLICS) === */
-/* ================================================= */
-
 /* 1. Fondo Oscuro */
 .modal-backdrop {
     position: fixed;

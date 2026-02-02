@@ -48,19 +48,33 @@ const crearSeccion = async (req, res) => {
 
 const obtenerSeccion = async (req, res) => {
     try {
-        const [secciones] = await db.query('SELECT * FROM secciones WHERE estado = 1 ORDER BY id DESC');
+        // Hacemos JOIN para obtener el 'nivel_id'
+        const query = `
+            SELECT 
+                s.id, 
+                s.nombre, 
+                s.nivel_id,   -- ESTE CAMPO ES OBLIGATORIO PARA EL FILTRO
+                n.nombre AS nombre_nivel
+            FROM secciones s
+            INNER JOIN niveles n ON s.nivel_id = n.id
+            WHERE s.estado = 1 
+            ORDER BY s.id DESC
+        `;
+
+        const [secciones] = await db.query(query);
+
         res.json({
             success: true,
             count: secciones.length,
             data: secciones
-        })
+        });
     } catch (error) {
-        console.error('Error al obtener secciones');
+        console.error('Error al obtener secciones:', error);
         res.status(500).json({
             success: false,
             mensaje: 'Error al obtener secciones',
             error: error.message
-        })
+        });
     }
 };
 

@@ -5,12 +5,15 @@
             <h4 class="mb-0 fw-bold text-white">
                 <i class="bi bi-journal-check me-2"></i> Nueva Matrícula
             </h4>
-            <p class="mb-0 text-white-50 small">Asignación de alumnos a periodos y secciones</p>
+            <p class="mb-0 text-white-50 small">
+                Asignación de alumnos a periodos y secciones
+            </p>
         </div>
 
         <div class="card-body p-4">
             <form [formGroup]="matriculaForm" (ngSubmit)="onSubmit()">
 
+                <!-- ALUMNO -->
                 <div class="mb-4">
                     <label class="form-label text-primary-dark">
                         <i class="bi bi-person-fill me-1"></i> Seleccionar Alumno
@@ -18,7 +21,9 @@
                     <div class="input-group">
                         <select class="form-select" formControlName="alumno_id"
                             [class.is-invalid]="isFieldInvalid('alumno_id')">
-                            <option value="" disabled selected>-- Busque un alumno --</option>
+                            <option value="" disabled selected>
+                                -- Busque un alumno --
+                            </option>
                             <option *ngFor="let alumno of alumnos" [value]="alumno.id">
                                 {{ alumno.apellidos }}, {{ alumno.nombres }} (DNI: {{ alumno.dni_ce }})
                             </option>
@@ -34,6 +39,8 @@
                 </div>
 
                 <div class="row g-3">
+
+                    <!-- PERIODO -->
                     <div class="col-md-6">
                         <label class="form-label text-primary-dark">Periodo</label>
                         <select class="form-select" formControlName="periodo_id"
@@ -48,6 +55,7 @@
                         </div>
                     </div>
 
+                    <!-- SECCIÓN -->
                     <div class="col-md-6">
                         <label class="form-label text-primary-dark">Sección / Aula</label>
                         <select class="form-select" formControlName="seccion_id"
@@ -62,6 +70,19 @@
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <label class="form-label text-primary-dark">Nivel</label>
+                        <select class="form-select" formControlName="nivel_id">
+                            <option [ngValue]="null">
+                                -- Seleccione nivel (opcional) --
+                            </option>
+                            <option *ngFor="let nivel of niveles" [value]="nivel.id">
+                                {{ nivel.nombre }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- SITUACIÓN -->
                     <div class="col-md-12 mt-3">
                         <label class="form-label text-primary-dark">Situación de Matrícula</label>
                         <div class="d-flex gap-3 mt-1">
@@ -70,11 +91,13 @@
                                     value="Ingresante">
                                 <label class="form-check-label" for="sit1">Ingresante</label>
                             </div>
+
                             <div class="form-check custom-radio">
                                 <input class="form-check-input" type="radio" formControlName="situacion" id="sit2"
                                     value="Promovido">
                                 <label class="form-check-label" for="sit2">Promovido</label>
                             </div>
+
                             <div class="form-check custom-radio">
                                 <input class="form-check-input" type="radio" formControlName="situacion" id="sit3"
                                     value="Repitente">
@@ -82,6 +105,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="d-grid gap-2 mt-5">
@@ -90,6 +114,7 @@
                         <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
                         {{ loading ? 'Procesando...' : 'Confirmar Matrícula' }}
                     </button>
+
                     <a routerLink="/matriculas" class="btn btn-link text-muted text-decoration-none text-center">
                         Cancelar y volver
                     </a>

@@ -1,6 +1,8 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+
+// Asegúrate de actualizar tu interfaz como puse arriba
 import { Matricula } from '../../models/matricula.interface';
 import { MatriculaService } from '../../services/matricula.service';
 
@@ -9,7 +11,7 @@ import { MatriculaService } from '../../services/matricula.service';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './matricula-list.component.html',
-  styleUrl: './matricula-list.component.css'
+  styleUrls: ['./matricula-list.component.css']
 })
 export class MatriculaListComponent implements OnInit {
 
@@ -26,8 +28,13 @@ export class MatriculaListComponent implements OnInit {
     this.loading = true;
     this.matriculaService.obtenerMatriculas().subscribe({
       next: (res: any) => {
+        // El backend devuelve: { success: true, data: [...] }
+        // Si tu backend devuelve directo el array, usa 'res'. Si es objeto, 'res.data'
         this.matriculas = res.data || res;
         this.loading = false;
+
+        // Opcional: Ver en consola para confirmar que llega el 'nivel'
+        console.log('Matrículas cargadas:', this.matriculas);
       },
       error: (err) => {
         console.error('Error cargando matrículas', err);
@@ -40,7 +47,7 @@ export class MatriculaListComponent implements OnInit {
     if (confirm('¿Estás seguro de anular esta matrícula? El alumno perderá su vacante.')) {
       this.matriculaService.eliminarMatricula(id).subscribe({
         next: () => {
-          this.cargarMatriculas();
+          this.cargarMatriculas(); // Recargar lista
         },
         error: (err) => alert('Error al eliminar matrícula')
       });

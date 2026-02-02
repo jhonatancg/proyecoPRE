@@ -4,15 +4,18 @@ export interface Matricula {
     situacion: string;
 
     alumno_id: number;
-    alumno_nombres?: string;
-    alumno_apellidos?: string;
-
     seccion_id: number;
-    seccion?: string;
-
     periodo_id: number;
-    periodo?: string;
-    anio_academico?: number;
+
+    alumno_nombres: string;
+    alumno_apellidos: string;
+
+    nivel: string;
+
+    seccion: string;
+
+    periodo: string;
+    anio_academico: number;
 }
 
 export interface MatriculaResponse {

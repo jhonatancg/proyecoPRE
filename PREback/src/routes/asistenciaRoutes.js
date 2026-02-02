@@ -5,6 +5,7 @@ const {
     registrarAsistencia,
     obtenerAsistencias,
     obtenerAsistenciasHoy,
+    obtenerAsistenciaPorAula,
     eliminarAsistencia,
     reenviarNotificacionesHoy
 } = require('../controllers/asistenciaController');
@@ -80,6 +81,9 @@ router.get('/', verificarToken, obtenerAsistencias);
  *         description: Error interno del servidor
  */
 router.get('/hoy', verificarToken, obtenerAsistenciasHoy);
+router.get('/aula/:nivel_id/:seccion_id/:fecha', verificarToken, obtenerAsistenciaPorAula);
+
+module.exports = router;
 
 /**
  * @swagger

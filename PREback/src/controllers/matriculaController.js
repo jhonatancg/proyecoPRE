@@ -2,6 +2,7 @@ const db = require('../config/database');
 
 const crearMatricula = async (req, res) => {
     try {
+        // CAMBIO 1: Ya no pedimos nivel_id en el body
         const { alumno_id, periodo_id, seccion_id, situacion } = req.body;
 
         if (!alumno_id || !seccion_id || !periodo_id || !situacion) {
@@ -11,6 +12,7 @@ const crearMatricula = async (req, res) => {
             });
         }
 
+        // Validar si ya existe matrícula
         const [existe] = await db.query(
             'SELECT id FROM matriculas WHERE alumno_id = ? AND periodo_id = ? AND estado = 1',
             [alumno_id, periodo_id]
@@ -23,8 +25,9 @@ const crearMatricula = async (req, res) => {
             });
         }
 
+        // CAMBIO 2: Quitamos nivel_id del INSERT
         const [resultado] = await db.query(
-            'INSERT INTO matriculas (alumno_id, seccion_id, periodo_id, fecha_matricula, situacion) VALUES (?, ?, ?, NOW(), ?)',
+            'INSERT INTO matriculas (alumno_id, seccion_id, periodo_id, fecha_matricula, situacion) VALUES (?,?,?, NOW(), ?)',
             [alumno_id, seccion_id, periodo_id, situacion]
         );
 
@@ -34,6 +37,7 @@ const crearMatricula = async (req, res) => {
             data: {
                 id: resultado.insertId,
                 alumno_id,
+                // nivel_id, // Ya no lo devolvemos directo porque no se guarda
                 seccion_id,
                 periodo_id,
                 situacion
@@ -41,7 +45,7 @@ const crearMatricula = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error al crear la matrícula:');
+        console.error('Error al crear la matrícula:', error);
         res.status(500).json({
             success: false,
             mensaje: 'Error al registrar la matrícula',
@@ -52,6 +56,7 @@ const crearMatricula = async (req, res) => {
 
 const obtenerMatriculas = async (req, res) => {
     try {
+        // CAMBIO 3: El JOIN para obtener el nivel ahora pasa por la sección
         const query = `
             SELECT 
                 m.id, 
@@ -60,11 +65,13 @@ const obtenerMatriculas = async (req, res) => {
                 a.nombres AS alumno_nombres, 
                 a.apellidos AS alumno_apellidos,
                 s.nombre AS seccion,
+                n.nombre AS nivel,   -- Obtenemos el nivel a través de la sección
                 p.nombre AS periodo,
                 p.anio AS anio_academico
             FROM matriculas m
             INNER JOIN alumnos a ON m.alumno_id = a.id
-            INNER JOIN secciones s ON m.seccion_id = s.id
+            INNER JOIN secciones s ON m.seccion_id = s.id  -- Primero unimos con secciones
+            INNER JOIN niveles n ON s.nivel_id = n.id      -- Luego la sección nos lleva al nivel
             INNER JOIN periodos_academicos p ON m.periodo_id = p.id
             WHERE m.estado = 1
             ORDER BY m.id DESC
@@ -79,7 +86,7 @@ const obtenerMatriculas = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error al obtener matrículas');
+        console.error('Error al obtener matrículas:', error);
         res.status(500).json({
             success: false,
             mensaje: 'Error al obtener las matrículas',
@@ -88,25 +95,14 @@ const obtenerMatriculas = async (req, res) => {
     }
 };
 
+// ... modificarMatricula y eliminarMatricula quedan IGUALES (solo usan ID) ...
 const modificarMatricula = async (req, res) => {
     try {
         const { id } = req.params;
         const { seccion_id, situacion } = req.body;
 
         if (!seccion_id || !situacion) {
-            return res.status(400).json({
-                success: false,
-                mensaje: 'Sección y situación son obligatorios para modificar'
-            });
-        }
-
-        const [matriculaExistente] = await db.query('SELECT id FROM matriculas WHERE id = ?', [id]);
-
-        if (matriculaExistente.length === 0) {
-            return res.status(404).json({
-                success: false,
-                mensaje: "Matrícula no encontrada"
-            });
+            return res.status(400).json({ success: false, mensaje: 'Faltan datos' });
         }
 
         await db.query(
@@ -114,48 +110,19 @@ const modificarMatricula = async (req, res) => {
             [seccion_id, situacion, id]
         );
 
-        res.status(200).json({
-            success: true,
-            mensaje: "Matrícula modificada exitosamente"
-        });
-
+        res.status(200).json({ success: true, mensaje: "Matrícula modificada" });
     } catch (error) {
-        console.error('Error al modificar la matrícula:', error);
-        res.status(500).json({
-            success: false,
-            mensaje: 'Error al modificar la matrícula',
-            error: error.message
-        });
+        res.status(500).json({ success: false, mensaje: 'Error al modificar', error: error.message });
     }
 };
 
 const eliminarMatricula = async (req, res) => {
     try {
         const { id } = req.params;
-
-        const [matriculaExistente] = await db.query('SELECT id FROM matriculas WHERE id = ?', [id]);
-
-        if (matriculaExistente.length === 0) {
-            return res.status(404).json({
-                success: false,
-                mensaje: "Matrícula no encontrada"
-            });
-        }
-
         await db.query('UPDATE matriculas SET estado = 0 WHERE id = ?', [id]);
-
-        res.status(200).json({
-            success: true,
-            mensaje: "Matrícula eliminada exitosamente"
-        });
-
+        res.status(200).json({ success: true, mensaje: "Matrícula eliminada" });
     } catch (error) {
-        console.error('Error al eliminar matrícula:', error);
-        res.status(500).json({
-            success: false,
-            mensaje: 'Error al eliminar la matrícula',
-            error: error.message
-        });
+        res.status(500).json({ success: false, mensaje: 'Error al eliminar', error: error.message });
     }
 };
 

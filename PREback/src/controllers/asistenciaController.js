@@ -171,6 +171,63 @@ const obtenerAsistenciasHoy = async (req, res) => {
     }
 };
 
+const obtenerAsistenciaPorAula = async (req, res) => {
+    try {
+        const { nivel_id, seccion_id, fecha } = req.params;
+
+        console.log('--- SOLICITUD DE REPORTE ---');
+        console.log(`1. Parámetros recibidos: Nivel=${nivel_id}, Sección=${seccion_id}, Fecha=${fecha}`);
+
+        if (!nivel_id || !seccion_id || !fecha) {
+            return res.status(400).json({ success: false, mensaje: "Faltan parámetros" });
+        }
+
+        // Esta consulta busca ALUMNOS MATRICULADOS y cruza con ASISTENCIA
+        const query = `
+            SELECT 
+                alu.id AS alumno_id,
+                alu.nombres,
+                alu.apellidos,
+                alu.dni_ce,
+                COALESCE(asi.hora_entrada, '-') AS hora_entrada, 
+                COALESCE(asi.situacion, 'FALTA') AS situacion,
+                sec.nombre AS nombre_seccion,
+                niv.nombre AS nombre_nivel
+            FROM matriculas mat
+            INNER JOIN alumnos alu ON mat.alumno_id = alu.id
+            INNER JOIN secciones sec ON mat.seccion_id = sec.id
+            INNER JOIN niveles niv ON sec.nivel_id = niv.id
+            LEFT JOIN asistencias asi ON alu.id = asi.alumno_id AND asi.fecha = ? AND asi.estado = 1
+            WHERE 
+                sec.nivel_id = ? 
+                AND mat.seccion_id = ? 
+                AND mat.estado = 1
+            ORDER BY alu.apellidos ASC
+        `;
+
+        const [asistencias] = await db.query(query, [fecha, nivel_id, seccion_id]);
+
+        console.log(`2. Alumnos encontrados en esa aula: ${asistencias.length}`);
+
+        if (asistencias.length === 0) {
+            console.log('⚠️ ADVERTENCIA: No se encontraron alumnos.');
+            console.log('   - Verifica que existan filas en la tabla "matriculas" para la seccion_id:', seccion_id);
+            console.log('   - Verifica que esas matrículas tengan estado = 1');
+        } else {
+            console.log('✅ Datos enviados al frontend correctamente.');
+        }
+
+        res.json({
+            success: true,
+            count: asistencias.length,
+            data: asistencias
+        });
+
+    } catch (error) {
+        console.error('❌ Error CRÍTICO en obtenerAsistenciaPorAula:', error);
+        res.status(500).json({ success: false, mensaje: 'Error del servidor', error: error.message });
+    }
+};
 const eliminarAsistencia = async (req, res) => {
     try {
         const { id } = req.params;
@@ -266,6 +323,7 @@ module.exports = {
     registrarAsistencia,
     obtenerAsistencias,
     obtenerAsistenciasHoy,
+    obtenerAsistenciaPorAula,
     eliminarAsistencia,
     reenviarNotificacionesHoy
 };
