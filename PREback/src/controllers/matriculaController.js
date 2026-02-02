@@ -95,7 +95,52 @@ const obtenerMatriculas = async (req, res) => {
     }
 };
 
-// ... modificarMatricula y eliminarMatricula quedan IGUALES (solo usan ID) ...
+const obtenerMatriculasPorAula = async (req, res) => {
+    try {
+        const { nivel_id, seccion_id } = req.params;
+
+        // Validamos parámetros
+        if (!nivel_id || !seccion_id) {
+            return res.status(400).json({ success: false, mensaje: "Faltan parámetros (nivel o sección)" });
+        }
+
+        const query = `
+            SELECT 
+                m.id, 
+                m.fecha_matricula, 
+                m.situacion,
+                a.nombres AS alumno_nombres, 
+                a.apellidos AS alumno_apellidos,
+                s.nombre AS seccion,
+                n.nombre AS nivel,
+                p.nombre AS periodo,
+                p.anio AS anio_academico
+            FROM matriculas m
+            INNER JOIN alumnos a ON m.alumno_id = a.id
+            INNER JOIN secciones s ON m.seccion_id = s.id
+            INNER JOIN niveles n ON s.nivel_id = n.id
+            INNER JOIN periodos_academicos p ON m.periodo_id = p.id
+            WHERE 
+                s.nivel_id = ? 
+                AND m.seccion_id = ?
+                AND m.estado = 1
+            ORDER BY a.apellidos ASC
+        `;
+
+        const [matriculas] = await db.query(query, [nivel_id, seccion_id]);
+
+        res.json({
+            success: true,
+            count: matriculas.length,
+            data: matriculas
+        });
+
+    } catch (error) {
+        console.error('Error al filtrar matrículas:', error);
+        res.status(500).json({ success: false, mensaje: 'Error al obtener matrículas', error: error.message });
+    }
+};
+
 const modificarMatricula = async (req, res) => {
     try {
         const { id } = req.params;
@@ -129,6 +174,7 @@ const eliminarMatricula = async (req, res) => {
 module.exports = {
     crearMatricula,
     obtenerMatriculas,
+    obtenerMatriculasPorAula,
     modificarMatricula,
     eliminarMatricula
 };

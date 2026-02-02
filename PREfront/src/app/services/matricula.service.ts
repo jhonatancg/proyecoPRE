@@ -20,11 +20,15 @@ export class MatriculaService {
     return this.http.post<MatriculaResponse>(this.apiUrl, datos);
   }
 
-  modificarMatricula(id: number, datos: { seccion_id: number; situacion: string }): Observable<MatriculaResponse> {
+  actualizarMatricula(id: number, datos: { seccion_id: number; situacion: string }): Observable<MatriculaResponse> {
     return this.http.put<MatriculaResponse>(`${this.apiUrl}/${id}`, datos);
   }
 
   eliminarMatricula(id: number): Observable<MatriculaResponse> {
     return this.http.delete<MatriculaResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  obtenerMatriculasPorAula(nivelId: number, seccionId: number) {
+    return this.http.get<any>(`${this.apiUrl}/aula/${nivelId}/${seccionId}`);
   }
 }

@@ -4,6 +4,7 @@ const router = express.Router();
 const {
     crearMatricula,
     obtenerMatriculas,
+    obtenerMatriculasPorAula,
     modificarMatricula,
     eliminarMatricula
 } = require('../controllers/matriculaController');
@@ -74,6 +75,7 @@ router.post('/', verificarToken, verificarAdmin, crearMatricula);
  *         description: Error interno del servidor
  */
 router.get('/', verificarToken, verificarDocente, obtenerMatriculas);
+router.get('/aula/:nivel_id/:seccion_id', verificarToken, obtenerMatriculasPorAula);
 
 /**
  * @swagger
