@@ -171,9 +171,6 @@ export class AsistenciaListComponent implements OnInit {
     this.alumnoSeleccionadoCarnet2 = null;
   }
 
-  // ==============================================================
-  // DESCARGA MASIVA CARNET 1 (9.5 x 5.8 cm) - 10 por Hoja (A4 Vertical)
-  // ==============================================================
   async descargarCarnets1() {
     if (this.asistencias.length === 0) return;
 
@@ -207,9 +204,7 @@ export class AsistenciaListComponent implements OnInit {
     this.generandoMasivo1 = false;
   }
 
-  // ==============================================================
-  // DESCARGA MASIVA CARNET 2 (14.6 x 6.0 cm) - 6 por Hoja (A4 Horizontal)
-  // ==============================================================
+
   async descargarCarnets2() {
     if (this.asistencias.length === 0) return;
 
@@ -218,16 +213,18 @@ export class AsistenciaListComponent implements OnInit {
 
     const pdf = new jsPDF('l', 'mm', 'a4');
 
+    // Medidas actualizadas a 14.6 cm x 3 cm
     const cardWidth = 146;
-    const cardHeight = 60;
+    const cardHeight = 30;
 
     const startX = 2.5;
     const startY = 10;
     const gapX = 0;
-    const gapY = 5;
+    const gapY = 3; // Espacio vertical reducido a 3mm para que quepan las 6 filas
 
     const posiciones = [];
-    for (let fila = 0; fila < 3; fila++) {
+    // Cambiamos a 6 filas (6 filas x 2 columnas = 12 carnets)
+    for (let fila = 0; fila < 6; fila++) {
       for (let col = 0; col < 2; col++) {
         posiciones.push([
           startX + col * (cardWidth + gapX),
@@ -239,13 +236,13 @@ export class AsistenciaListComponent implements OnInit {
     const container = document.getElementById('contenedor-carnets-masivos2');
     if (!container) { this.generandoMasivo2 = false; return; }
 
-    await this.procesarPDF(pdf, container, posiciones, cardWidth, cardHeight, 6, 'Carnets_Aula_Modelo2.pdf');
+    // Cambiamos el límite por página a 12
+    await this.procesarPDF(pdf, container, posiciones, cardWidth, cardHeight, 12, 'Carnets_Aula_Modelo2.pdf');
     this.generandoMasivo2 = false;
   }
 
-  // ==============================================================
   // FUNCIÓN REUTILIZABLE PARA GENERAR EL PDF MASIVO
-  // ==============================================================
+
   private async procesarPDF(pdf: jsPDF, container: HTMLElement, posiciones: number[][],
     cardWidth: number, cardHeight: number, limitPerPage: number, filename: string) {
 

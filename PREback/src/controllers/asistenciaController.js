@@ -31,9 +31,9 @@ const registrarAsistencia = async (req, res) => {
         let queryDuplicado = '';
 
         if (esTurnoManana) {
-            queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada < '12:00:00'";
+            queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada < '15:30:00'";
         } else {
-            queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada >= '12:00:00'";
+            queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada >= '15:30:00'";
         }
 
         const [existe] = await db.query(queryDuplicado, [alumno_id]);
@@ -290,8 +290,7 @@ const reenviarNotificacionesHoy = async (req, res) => {
                 const icono = registro.situacion === 'PUNTUAL' ? '✅' : '⚠️';
                 const horaLegible = registro.hora_entrada;
 
-                const textoMensaje = `Hola, por problemas de red, recién se está enviando la notificación de asistencia. El alumno *${registro.nombres} ${registro.apellidos}* asistió con normalidad esta mañana.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
-
+                const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*\n\nEste mensaje ha sido generado por un BOT de servicio, no responda a este número, cualquier duda o consulta póngase en contacto con la auxiliar `;
                 console.log(`📤 Reenviando a: ${registro.nombres} (${registro.cel_apoderado})...`);
 
                 const exito = await enviarMensaje(registro.cel_apoderado, textoMensaje);

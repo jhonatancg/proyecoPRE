@@ -28,6 +28,7 @@ export class MatriculaFormComponent implements OnInit {
 
   alumnos: Alumno[] = [];
   secciones: Seccion[] = [];
+  seccionesFiltradas: Seccion[] = []; // Nueva lista para las secciones filtradas
   periodos: Periodo[] = [];
   niveles: Nivel[] = [];
 
@@ -43,8 +44,8 @@ export class MatriculaFormComponent implements OnInit {
     this.matriculaForm = this.fb.group({
       alumno_id: ['', Validators.required],
       periodo_id: ['', Validators.required],
-      seccion_id: ['', Validators.required],
-      nivel_id: [null], // ✅ opcional
+      nivel_id: ['', Validators.required], // Ahora es obligatorio
+      seccion_id: [{ value: '', disabled: true }, Validators.required], // Empieza deshabilitado
       situacion: ['Ingresante', Validators.required]
     });
   }
@@ -76,6 +77,30 @@ export class MatriculaFormComponent implements OnInit {
     });
   }
 
+  // --- LÓGICA DE CASCADA NIVEL -> SECCIÓN ---
+  onNivelChange(): void {
+    const nivelId = this.matriculaForm.get('nivel_id')?.value;
+    const seccionControl = this.matriculaForm.get('seccion_id');
+
+    // Resetea el valor de la sección
+    seccionControl?.setValue('');
+
+    if (nivelId) {
+      // Filtra las secciones que pertenecen al nivel seleccionado
+      this.seccionesFiltradas = this.secciones.filter(s => s.nivel_id == nivelId);
+
+      // Habilita el campo de sección si hay resultados
+      if (this.seccionesFiltradas.length > 0) {
+        seccionControl?.enable();
+      } else {
+        seccionControl?.disable();
+      }
+    } else {
+      this.seccionesFiltradas = [];
+      seccionControl?.disable();
+    }
+  }
+
   onSubmit(): void {
     if (this.matriculaForm.invalid) {
       this.matriculaForm.markAllAsTouched();
@@ -85,13 +110,11 @@ export class MatriculaFormComponent implements OnInit {
     this.loading = true;
 
     const datosGuardar = {
-      alumno_id: Number(this.matriculaForm.value.alumno_id),
-      periodo_id: Number(this.matriculaForm.value.periodo_id),
-      seccion_id: Number(this.matriculaForm.value.seccion_id),
-      nivel_id: this.matriculaForm.value.nivel_id
-        ? Number(this.matriculaForm.value.nivel_id)
-        : null,
-      situacion: this.matriculaForm.value.situacion
+      alumno_id: Number(this.matriculaForm.getRawValue().alumno_id),
+      periodo_id: Number(this.matriculaForm.getRawValue().periodo_id),
+      seccion_id: Number(this.matriculaForm.getRawValue().seccion_id),
+      nivel_id: Number(this.matriculaForm.getRawValue().nivel_id),
+      situacion: this.matriculaForm.getRawValue().situacion
     };
 
     this.matriculaService.crearMatricula(datosGuardar).subscribe({

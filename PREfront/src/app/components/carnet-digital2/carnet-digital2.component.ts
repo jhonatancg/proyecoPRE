@@ -18,9 +18,10 @@ export class CarnetDigital2Component implements OnChanges {
 
   generandoPDF: boolean = false;
 
+  // Ajustado a 75x75 para que encaje perfecto en los 3cm de alto
   public config: Options = {
-    width: 140,
-    height: 140,
+    width: 75,
+    height: 75,
     data: 'ESPERANDO DATOS',
     margin: 0,
     dotsOptions: { color: '#0d47a1', type: 'rounded' },
@@ -49,11 +50,12 @@ export class CarnetDigital2Component implements OnChanges {
         backgroundColor: null
       }).then(canvas => {
 
-        // --- MEDIDAS EXACTAS (15 cm x 6.0 cm) ---
+        // --- MEDIDAS EXACTAS (14.6 cm ancho x 3.0 cm alto) ---
         const imgWidth = 146;
-        const imgHeight = 60;
+        const imgHeight = 30;
 
-        const pdf = new jsPDF('p', 'mm', 'a4');
+        // Hoja horizontal ('l')
+        const pdf = new jsPDF('l', 'mm', 'a4');
 
         const positionX = 30;
         const positionY = 20;

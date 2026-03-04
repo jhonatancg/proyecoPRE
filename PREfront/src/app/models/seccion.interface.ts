@@ -1,6 +1,7 @@
 export interface Seccion {
     id: number;
     nombre: string;
+    nivel_id?: number
     estado?: number;
 }
 

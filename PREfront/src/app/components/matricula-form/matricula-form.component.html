@@ -13,7 +13,6 @@
         <div class="card-body p-4">
             <form [formGroup]="matriculaForm" (ngSubmit)="onSubmit()">
 
-                <!-- ALUMNO -->
                 <div class="mb-4">
                     <label class="form-label text-primary-dark">
                         <i class="bi bi-person-fill me-1"></i> Seleccionar Alumno
@@ -40,8 +39,7 @@
 
                 <div class="row g-3">
 
-                    <!-- PERIODO -->
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label text-primary-dark">Periodo</label>
                         <select class="form-select" formControlName="periodo_id"
                             [class.is-invalid]="isFieldInvalid('periodo_id')">
@@ -55,13 +53,29 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN -->
+                    <div class="col-md-6">
+                        <label class="form-label text-primary-dark">Nivel</label>
+                        <select class="form-select" formControlName="nivel_id" (change)="onNivelChange()"
+                            [class.is-invalid]="isFieldInvalid('nivel_id')">
+                            <option value="" disabled selected>-- Seleccione nivel --</option>
+                            <option *ngFor="let nivel of niveles" [value]="nivel.id">
+                                {{ nivel.nombre }}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback d-block" *ngIf="isFieldInvalid('nivel_id')">
+                            Debe seleccionar un nivel.
+                        </div>
+                    </div>
+
                     <div class="col-md-6">
                         <label class="form-label text-primary-dark">Sección / Aula</label>
                         <select class="form-select" formControlName="seccion_id"
                             [class.is-invalid]="isFieldInvalid('seccion_id')">
-                            <option value="" disabled selected>Seleccione...</option>
-                            <option *ngFor="let seccion of secciones" [value]="seccion.id">
+                            <option value="" disabled selected>
+                                {{ matriculaForm.get('seccion_id')?.disabled ? 'Primero seleccione un nivel' :
+                                'Seleccione...' }}
+                            </option>
+                            <option *ngFor="let seccion of seccionesFiltradas" [value]="seccion.id">
                                 {{ seccion.nombre }}
                             </option>
                         </select>
@@ -70,19 +84,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label text-primary-dark">Nivel</label>
-                        <select class="form-select" formControlName="nivel_id">
-                            <option [ngValue]="null">
-                                -- Seleccione nivel (opcional) --
-                            </option>
-                            <option *ngFor="let nivel of niveles" [value]="nivel.id">
-                                {{ nivel.nombre }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <!-- SITUACIÓN -->
                     <div class="col-md-12 mt-3">
                         <label class="form-label text-primary-dark">Situación de Matrícula</label>
                         <div class="d-flex gap-3 mt-1">
