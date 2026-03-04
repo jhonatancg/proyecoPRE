@@ -36,12 +36,30 @@
             </div>
 
             <div class="table-container" *ngIf="asistencias.length > 0; else emptyState">
-                <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white border-bottom">
+
+                <div
+                    class="d-flex justify-content-between align-items-center px-4 py-3 bg-white border-bottom flex-wrap gap-2">
                     <span class="text-muted fw-bold">RESULTADOS: {{ asistencias.length }}</span>
-                    <button class="btn btn-sm btn-outline-danger" (click)="exportarPDF()">
-                        <i class="bi bi-file-pdf"></i> PDF
-                    </button>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-info fw-bold" (click)="descargarCarnets1()"
+                            [disabled]="generandoMasivo1 || generandoMasivo2">
+                            <span *ngIf="!generandoMasivo1"><i class="bi bi-person-badge"></i> Carnets</span>
+                            <span *ngIf="generandoMasivo1"><span class="spinner-border spinner-border-sm"></span></span>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-secondary fw-bold" (click)="descargarCarnets2()"
+                            [disabled]="generandoMasivo1 || generandoMasivo2">
+                            <span *ngIf="!generandoMasivo2"><i class="bi bi-card-heading"></i> Agendas</span>
+                            <span *ngIf="generandoMasivo2"><span class="spinner-border spinner-border-sm"></span></span>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-danger fw-bold" (click)="exportarPDF()">
+                            <i class="bi bi-file-pdf"></i> Reporte PDF
+                        </button>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table custom-table mb-0 align-middle">
                         <thead>
@@ -72,9 +90,20 @@
                                     }">{{ item.situacion }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-primary" (click)="abrirModalEditar(item)">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </button>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-sm btn-outline-info" (click)="verCarnet1(item)"
+                                            title="Ver Carnet 1">
+                                            <i class="bi bi-person-badge"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" (click)="verCarnet2(item)"
+                                            title="Ver Carnet 2">
+                                            <i class="bi bi-card-heading"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" (click)="abrirModalEditar(item)"
+                                            title="Editar Estado">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -113,5 +142,43 @@
                 <button class="btn btn-primary" (click)="guardarCambio()">Guardar</button>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="alumnoSeleccionadoCarnet1"></div>
+<div class="modal fade show d-block" *ngIf="alumnoSeleccionadoCarnet1" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+            <div class="text-end mb-2">
+                <button type="button" class="btn-close btn-close-white bg-white" (click)="cerrarCarnet1()"></button>
+            </div>
+            <app-carnet-digital [alumno]="alumnoSeleccionadoCarnet1"></app-carnet-digital>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="alumnoSeleccionadoCarnet2"></div>
+<div class="modal fade show d-block" *ngIf="alumnoSeleccionadoCarnet2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg d-flex justify-content-center">
+        <div class="modal-content bg-transparent border-0 shadow-none align-items-center">
+            <div class="text-end mb-2 w-100" style="max-width: 500px;">
+                <button type="button" class="btn-close btn-close-white bg-white" (click)="cerrarCarnet2()"></button>
+            </div>
+            <app-carnet-digital2 [alumno]="alumnoSeleccionadoCarnet2"></app-carnet-digital2>
+        </div>
+    </div>
+</div>
+
+<div id="contenedor-carnets-masivos1"
+    style="position: fixed; left: -9999px; top: 0; width: 350px; height: 0; overflow: hidden;">
+    <div *ngFor="let item of asistencias" style="margin-bottom: 20px;">
+        <app-carnet-digital [alumno]="prepararAlumnoParaCarnet(item)" [ocultarAcciones]="true"></app-carnet-digital>
+    </div>
+</div>
+
+<div id="contenedor-carnets-masivos2"
+    style="position: fixed; left: -9999px; top: 0; width: 550px; height: 0; overflow: hidden;">
+    <div *ngFor="let item of asistencias" style="margin-bottom: 20px;">
+        <app-carnet-digital2 [alumno]="prepararAlumnoParaCarnet(item)" [ocultarAcciones]="true"></app-carnet-digital2>
     </div>
 </div>

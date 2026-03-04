@@ -1,0 +1,35 @@
+<div class="carnet-backdrop pb-4" *ngIf="alumno">
+
+    <div class="carnet-container horizontal-15x6 shadow-lg" id="carnetImprimir2">
+
+        <img src="assets/img/icono-pre.png" class="watermark-bg" alt="Fondo Escudo">
+
+        <div class="top-accent-line"></div>
+
+        <div class="carnet-content">
+            <div class="data-section">
+                <div class="grade-text">{{ alumno.nivel?.charAt(0) || '1' }}{{ alumno.seccion || 'A' }}</div>
+
+                <div class="student-label">ESTUDIANTE</div>
+                <div class="name-text">{{ alumno.nombres }}</div>
+                <div class="lastname-text">{{ alumno.apellidos }}</div>
+            </div>
+
+            <div class="qr-section">
+                <div class="qr-box shadow-sm">
+                    <ngx-qrcode-styling [config]="config"></ngx-qrcode-styling>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="actions mt-4 d-print-none text-center" *ngIf="!ocultarAcciones">
+        <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="imprimirCarnet()"
+            [disabled]="generandoPDF">
+            <i class="bi me-2" [ngClass]="generandoPDF ? 'bi-hourglass-split' : 'bi-file-earmark-pdf-fill'"></i>
+            {{ generandoPDF ? 'Generando PDF...' : 'Descargar Carnet PDF' }}
+        </button>
+    </div>
+
+</div>

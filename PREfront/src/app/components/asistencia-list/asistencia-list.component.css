@@ -184,14 +184,13 @@
     border: 1px solid #ffcdd2;
 }
 
-/* NUEVO: Estado Justificado (Azul Celeste) */
 .status-justificada {
     background-color: var(--info-bg);
     color: var(--info-text);
     border: 1px solid #b3e5fc;
 }
 
-/* === BOTONES DE ACCIÓN (Editar / PDF) === */
+/* === BOTONES DE ACCIÓN === */
 .btn-sm {
     padding: 5px 10px;
     font-size: 0.85rem;
@@ -210,6 +209,31 @@
     color: white;
 }
 
+/* Nuevos botones para los carnets */
+.btn-outline-info {
+    color: #00acc1;
+    border-color: #00acc1;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-outline-info:hover {
+    background-color: #00acc1;
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: #757575;
+    border-color: #757575;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #757575;
+    color: white;
+}
+
 .btn-outline-danger {
     color: var(--danger-text);
     border-color: var(--danger-text);
@@ -223,11 +247,8 @@
 /* === MODAL === */
 .modal.show {
     background-color: rgba(0, 0, 0, 0.5);
-    /* Fondo oscuro */
     backdrop-filter: blur(2px);
-    /* Efecto borroso suave */
     display: block;
-    /* Asegura que se vea */
     overflow-y: auto;
 }
 
@@ -244,9 +265,19 @@
     border-bottom: none;
 }
 
-/* Botón X blanco en el modal */
-.btn-close-white {
+/* Botón X blanco para los carnets (Fondo blanco e ícono gris/negro) */
+.btn-close-white.bg-white {
+    background-color: #ffffff;
+    opacity: 1;
+    filter: invert(18%) sepia(90%) saturate(7000%) hue-rotate(350deg) brightness(95%) contrast(110%);
+    cursor: pointer;
+    z-index: 10070;
+}
+
+/* Botón X blanco del header (Completamente blanco) */
+.modal-header .btn-close-white {
     filter: invert(1) grayscale(100%) brightness(200%);
+    background-color: transparent;
 }
 
 /* === EMPTY STATE === */

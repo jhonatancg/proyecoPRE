@@ -6,43 +6,32 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 @Component({
-  selector: 'app-carnet-digital',
+  selector: 'app-carnet-digital2',
   standalone: true,
   imports: [CommonModule, NgxQrcodeStylingComponent],
-  templateUrl: './carnet-digital.component.html',
-  styleUrls: ['./carnet-digital.component.css']
+  templateUrl: './carnet-digital2.component.html',
+  styleUrls: ['./carnet-digital2.component.css']
 })
-export class CarnetDigitalComponent implements OnChanges {
+export class CarnetDigital2Component implements OnChanges {
   @Input() alumno: any = null;
   @Input() ocultarAcciones: boolean = false;
 
   generandoPDF: boolean = false;
 
-  // Ajustado para el nuevo tamaño horizontal
   public config: Options = {
-    width: 90,
-    height: 90,
+    width: 140,
+    height: 140,
     data: 'ESPERANDO DATOS',
     margin: 0,
-    dotsOptions: {
-      color: '#0d47a1',
-      type: 'rounded'
-    },
-    backgroundOptions: {
-      color: '#ffffff'
-    },
-    cornersSquareOptions: {
-      color: '#1565c0',
-      type: 'extra-rounded'
-    }
+    dotsOptions: { color: '#0d47a1', type: 'rounded' },
+    backgroundOptions: { color: '#ffffff' },
+    cornersSquareOptions: { color: '#1565c0', type: 'extra-rounded' }
   };
-
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['alumno'] && this.alumno) {
       this.config = {
         ...this.config,
-        // Seguimos usando el DNI/CE para el QR, ya que eso es lo que el escáner leerá
         data: this.alumno.dni_ce || this.alumno.dni || 'SIN-DNI'
       };
     }
@@ -51,7 +40,7 @@ export class CarnetDigitalComponent implements OnChanges {
   imprimirCarnet() {
     this.generandoPDF = true;
 
-    const data = document.getElementById('carnetImprimir');
+    const data = document.getElementById('carnetImprimir2');
 
     if (data) {
       html2canvas(data, {
@@ -60,14 +49,14 @@ export class CarnetDigitalComponent implements OnChanges {
         backgroundColor: null
       }).then(canvas => {
 
-        // --- MEDIDAS EXACTAS (9.5 cm x 6.0 cm) ---
-        const imgWidth = 95;  // Ancho horizontal
-        const imgHeight = 58; // Alto horizontal
+        // --- MEDIDAS EXACTAS (15 cm x 6.0 cm) ---
+        const imgWidth = 146;
+        const imgHeight = 60;
 
-        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pdf = new jsPDF('p', 'mm', 'a4');
 
-        const positionX = 15;
-        const positionY = 15;
+        const positionX = 30;
+        const positionY = 20;
 
         const contentDataURL = canvas.toDataURL('image/jpeg', 0.95);
 
@@ -82,7 +71,7 @@ export class CarnetDigitalComponent implements OnChanges {
         this.generandoPDF = false;
       });
     } else {
-      console.error("No se encontró el ID 'carnetImprimir'");
+      console.error("No se encontró el ID 'carnetImprimir2'");
       this.generandoPDF = false;
     }
   }

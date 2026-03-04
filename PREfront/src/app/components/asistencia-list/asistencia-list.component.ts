@@ -6,11 +6,16 @@ import { SeccionService } from '../../services/seccion.service';
 import { AsistenciaService } from '../../services/asistencia.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+
+// --- IMPORTAMOS LOS COMPONENTES DE CARNETS ---
+import { CarnetDigitalComponent } from '../carnet-digital/carnet-digital.component';
+import { CarnetDigital2Component } from '../carnet-digital2/carnet-digital2.component';
 
 @Component({
   selector: 'app-asistencia-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CarnetDigitalComponent, CarnetDigital2Component],
   templateUrl: './asistencia-list.component.html',
   styleUrls: ['./asistencia-list.component.css']
 })
@@ -36,6 +41,15 @@ export class AsistenciaListComponent implements OnInit {
   nuevaSituacion: string = '';
 
   listaSituaciones: string[] = ['PUNTUAL', 'TARDE', 'FALTA', 'FALTA JUSTIFICADA', 'TARDANZA JUSTIFICADA'];
+
+  // --- VARIABLES PARA LOS CARNETS ---
+  alumnoSeleccionadoCarnet1: any = null;
+  alumnoSeleccionadoCarnet2: any = null;
+
+  // --- ESTADOS DE DESCARGA MASIVA ---
+  generandoMasivo1: boolean = false;
+  generandoMasivo2: boolean = false;
+  progresoMasivo: string = '';
 
   constructor(
     private nivelService: NivelService,
@@ -96,7 +110,6 @@ export class AsistenciaListComponent implements OnInit {
       });
   }
 
-  // --- LÓGICA DEL MODAL ---
   abrirModalEditar(item: any) {
     this.asistenciaEditar = item;
     this.nuevaSituacion = item.situacion;
@@ -122,7 +135,7 @@ export class AsistenciaListComponent implements OnInit {
       next: (res) => {
         alert(res.mensaje);
         this.cerrarModal();
-        this.buscarAsistencias(); // Recargar la tabla
+        this.buscarAsistencias();
       },
       error: () => {
         alert('Error al guardar cambio');
@@ -131,6 +144,154 @@ export class AsistenciaListComponent implements OnInit {
     });
   }
 
+  prepararAlumnoParaCarnet(item: any) {
+    const nivelObj = this.niveles.find(n => n.id == this.nivelSeleccionado);
+    const seccionObj = this.seccionesFiltradas.find(s => s.id == this.seccionSeleccionada);
+
+    return {
+      ...item,
+      nivel: nivelObj ? nivelObj.nombre : 'PRE',
+      seccion: seccionObj ? seccionObj.nombre : 'A'
+    };
+  }
+
+  verCarnet1(item: any) {
+    this.alumnoSeleccionadoCarnet1 = this.prepararAlumnoParaCarnet(item);
+  }
+
+  cerrarCarnet1() {
+    this.alumnoSeleccionadoCarnet1 = null;
+  }
+
+  verCarnet2(item: any) {
+    this.alumnoSeleccionadoCarnet2 = this.prepararAlumnoParaCarnet(item);
+  }
+
+  cerrarCarnet2() {
+    this.alumnoSeleccionadoCarnet2 = null;
+  }
+
+  // ==============================================================
+  // DESCARGA MASIVA CARNET 1 (9.5 x 5.8 cm) - 10 por Hoja (A4 Vertical)
+  // ==============================================================
+  async descargarCarnets1() {
+    if (this.asistencias.length === 0) return;
+
+    this.generandoMasivo1 = true;
+    this.progresoMasivo = 'Iniciando Carnets 1...';
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const cardWidth = 95;
+    const cardHeight = 58;
+
+    const startX = 7.5;
+    const startY = 3.5;
+    const gapX = 5;
+    const gapY = 0;
+
+    const posiciones = [];
+    for (let fila = 0; fila < 5; fila++) {
+      for (let col = 0; col < 2; col++) {
+        posiciones.push([
+          startX + col * (cardWidth + gapX),
+          startY + fila * (cardHeight + gapY)
+        ]);
+      }
+    }
+
+    const container = document.getElementById('contenedor-carnets-masivos1');
+    if (!container) { this.generandoMasivo1 = false; return; }
+
+    await this.procesarPDF(pdf, container, posiciones, cardWidth, cardHeight, 10, 'Carnets_Aula_Modelo1.pdf');
+    this.generandoMasivo1 = false;
+  }
+
+  // ==============================================================
+  // DESCARGA MASIVA CARNET 2 (14.6 x 6.0 cm) - 6 por Hoja (A4 Horizontal)
+  // ==============================================================
+  async descargarCarnets2() {
+    if (this.asistencias.length === 0) return;
+
+    this.generandoMasivo2 = true;
+    this.progresoMasivo = 'Iniciando Carnets 2...';
+
+    const pdf = new jsPDF('l', 'mm', 'a4');
+
+    const cardWidth = 146;
+    const cardHeight = 60;
+
+    const startX = 2.5;
+    const startY = 10;
+    const gapX = 0;
+    const gapY = 5;
+
+    const posiciones = [];
+    for (let fila = 0; fila < 3; fila++) {
+      for (let col = 0; col < 2; col++) {
+        posiciones.push([
+          startX + col * (cardWidth + gapX),
+          startY + fila * (cardHeight + gapY)
+        ]);
+      }
+    }
+
+    const container = document.getElementById('contenedor-carnets-masivos2');
+    if (!container) { this.generandoMasivo2 = false; return; }
+
+    await this.procesarPDF(pdf, container, posiciones, cardWidth, cardHeight, 6, 'Carnets_Aula_Modelo2.pdf');
+    this.generandoMasivo2 = false;
+  }
+
+  // ==============================================================
+  // FUNCIÓN REUTILIZABLE PARA GENERAR EL PDF MASIVO
+  // ==============================================================
+  private async procesarPDF(pdf: jsPDF, container: HTMLElement, posiciones: number[][],
+    cardWidth: number, cardHeight: number, limitPerPage: number, filename: string) {
+
+    const wrapperDivs = container.children;
+    let cardsInPage = 0;
+
+    for (let i = 0; i < this.asistencias.length; i++) {
+      this.progresoMasivo = `Procesando ${i + 1} de ${this.asistencias.length}...`;
+
+      const wrapper = wrapperDivs[i] as HTMLElement;
+      const carnetElement = wrapper.querySelector('.carnet-container') as HTMLElement;
+
+      if (!carnetElement) continue;
+
+      try {
+        const canvas = await html2canvas(carnetElement, {
+          scale: 3,
+          logging: false,
+          useCORS: true,
+          backgroundColor: null
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const posIndex = cardsInPage % limitPerPage;
+        const [x, y] = posiciones[posIndex];
+
+        if (cardsInPage > 0 && cardsInPage % limitPerPage === 0) {
+          pdf.addPage();
+        }
+
+        pdf.addImage(imgData, 'JPEG', x, y, cardWidth, cardHeight);
+        cardsInPage++;
+
+        // Pequeña pausa para que el navegador no se congele
+        if (i % 5 === 0) await new Promise(r => setTimeout(r, 20));
+
+      } catch (e) {
+        console.error(`Error procesando carnet ${i}`, e);
+      }
+    }
+
+    this.progresoMasivo = 'Finalizando PDF...';
+    pdf.save(filename);
+  }
+
+  // --- EXPORTAR PDF REPORTE ASISTENCIA ---
   exportarPDF() {
     if (this.asistencias.length === 0) return;
     const doc = new jsPDF();
