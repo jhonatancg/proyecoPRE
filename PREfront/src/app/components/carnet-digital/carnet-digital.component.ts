@@ -18,12 +18,12 @@ export class CarnetDigitalComponent implements OnChanges {
 
   generandoPDF: boolean = false;
 
-
+  // Ajustado para el nuevo tamaño horizontal
   public config: Options = {
-    width: 150,
-    height: 150,
+    width: 90,
+    height: 90,
     data: 'ESPERANDO DATOS',
-    margin: 5,
+    margin: 0,
     dotsOptions: {
       color: '#0d47a1',
       type: 'rounded'
@@ -40,43 +40,39 @@ export class CarnetDigitalComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['alumno'] && this.alumno) {
-
       this.config = {
         ...this.config,
+        // Seguimos usando el DNI/CE para el QR, ya que eso es lo que el escáner leerá
         data: this.alumno.dni_ce || this.alumno.dni || 'SIN-DNI'
       };
-
     }
   }
 
   imprimirCarnet() {
-    this.generandoPDF = true; // Activar estado de carga
+    this.generandoPDF = true;
 
     const data = document.getElementById('carnetImprimir');
 
     if (data) {
       html2canvas(data, {
-        scale: 4, // Alta calidad
-        useCORS: true
+        scale: 4,
+        useCORS: true,
+        backgroundColor: null
       }).then(canvas => {
 
-        // --- 1. CONFIGURACIÓN DE MEDIDAS 
-        const imgWidth = 98;  //  Ancho
-        const imgHeight = 155; //  Alto
+        // --- MEDIDAS EXACTAS (9.5 cm x 6.0 cm) ---
+        const imgWidth = 95;  // Ancho horizontal
+        const imgHeight = 60; // Alto horizontal
 
-        // --- 2. CONFIGURAR PDF EN HORIZONTAL ('l' = landscape) ---
         const pdf = new jsPDF('l', 'mm', 'a4');
 
-        // --- 3. POSICIÓN "A UN COSTADO" ---
-        const positionX = 15; // 15mm desde la izquierda
-        const positionY = 15; // 15mm desde arriba
+        const positionX = 15;
+        const positionY = 15;
 
-        const contentDataURL = canvas.toDataURL('image/png');
+        const contentDataURL = canvas.toDataURL('image/jpeg', 0.95);
 
-        // Agregamos la imagen con las medidas y posición forzadas
-        pdf.addImage(contentDataURL, 'PNG', positionX, positionY, imgWidth, imgHeight);
+        pdf.addImage(contentDataURL, 'JPEG', positionX, positionY, imgWidth, imgHeight);
 
-        // Guardamos el archivo
         const nombreArchivo = `Carnet_${this.alumno.nombres || 'Alumno'}.pdf`;
         pdf.save(nombreArchivo);
 
@@ -90,5 +86,4 @@ export class CarnetDigitalComponent implements OnChanges {
       this.generandoPDF = false;
     }
   }
-
 }

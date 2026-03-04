@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { Alumno } from '../../models/alumno.interface';
 import { AlumnoService } from '../../services/alumno.service';
 import { AuthService } from '../../services/auth.service';
+import { MatriculaService } from '../../services/matricula.service';
 
 import { CarnetDigitalComponent } from '../carnet-digital/carnet-digital.component';
 
@@ -27,9 +28,14 @@ export class AlumnoListComponent implements OnInit {
   generandoMasivo: boolean = false;
   progresoMasivo: string = '';
 
+  // --- VARIABLES DE PAGINACIÓN ---
+  currentPage: number = 1;
+  itemsPerPage: number = 20;
+
   constructor(
     private alumnoService: AlumnoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private matriculaService: MatriculaService
   ) { }
 
   ngOnInit(): void {
@@ -38,14 +44,52 @@ export class AlumnoListComponent implements OnInit {
 
   cargarAlumnos(): void {
     this.alumnoService.obtenerAlumnos().subscribe({
-      next: (response) => {
+      next: (resAlumnos) => {
+        let listaAlumnos: Alumno[] = [];
 
-        if (response.success && Array.isArray(response.data)) {
-          this.alumnos = response.data;
-        } else if (Array.isArray(response)) {
-
-          this.alumnos = response;
+        if (resAlumnos.success && Array.isArray(resAlumnos.data)) {
+          listaAlumnos = resAlumnos.data;
+        } else if (Array.isArray(resAlumnos)) {
+          listaAlumnos = resAlumnos;
         }
+
+        // Una vez que tenemos los alumnos, traemos las matrículas
+        this.matriculaService.obtenerMatriculas().subscribe({
+          next: (resMatriculas) => {
+            let listaMatriculas: any[] = [];
+
+            if (resMatriculas.success && Array.isArray(resMatriculas.data)) {
+              listaMatriculas = resMatriculas.data;
+            } else if (Array.isArray(resMatriculas)) {
+              listaMatriculas = resMatriculas;
+            }
+
+            // CRUCE DE DATOS: Le asignamos a cada alumno su nivel y sección
+            listaAlumnos.forEach(alumno => {
+
+              // SOLUCIÓN 1: Convertimos ambos a Number() para evitar fallos si uno es texto ("1") y otro número (1)
+              const matricula = listaMatriculas.find(m => Number(m.alumno_id) === Number(alumno.id));
+
+              if (matricula) {
+                // SOLUCIÓN 2: Verificamos si el backend te está mandando la info o no
+                alumno.nivel = matricula.nivel || matricula.grado || 'PRE'; // 'PRE' como respaldo
+                alumno.seccion = matricula.seccion || 'A'; // 'A' como respaldo
+              } else {
+                alumno.nivel = 'No Matriculado';
+                alumno.seccion = 'Sin Asignar';
+              }
+            });
+
+            // Guardamos la lista completa y reiniciamos la paginación
+            this.alumnos = listaAlumnos;
+            this.currentPage = 1;
+          },
+          error: (err) => {
+            console.error('Error al cargar matrículas', err);
+            this.alumnos = listaAlumnos;
+            this.currentPage = 1;
+          }
+        });
       },
       error: (err) => {
         console.error('Error al cargar alumnos:', err);
@@ -54,11 +98,37 @@ export class AlumnoListComponent implements OnInit {
     });
   }
 
+  // --- MÉTODOS DE PAGINACIÓN ---
+  get paginatedAlumnos(): Alumno[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.alumnos.slice(startIndex, endIndex);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.alumnos.length / this.itemsPerPage) || 1;
+  }
+
+  get startIndexRecord(): number {
+    return (this.currentPage - 1) * this.itemsPerPage + 1;
+  }
+
+  get endIndexRecord(): number {
+    return Math.min(this.currentPage * this.itemsPerPage, this.alumnos.length);
+  }
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+  // -----------------------------
+
   eliminarAlumno(id: number) {
     if (confirm('¿Estás seguro de eliminar este alumno?')) {
       this.alumnoService.eliminarAlumno(id).subscribe({
         next: (response) => {
-          this.cargarAlumnos();
+          this.cargarAlumnos(); // Refresca correctamente con los datos cruzados
         },
         error: (err) => {
           console.error(err);
@@ -82,24 +152,28 @@ export class AlumnoListComponent implements OnInit {
     this.generandoMasivo = true;
     this.progresoMasivo = 'Iniciando generación...';
 
-    // Al usar JPEG y Escala 3, consumimos mucha menos memoria.
-    // Intentaremos generar todo en UN SOLO ARCHIVO. 
-    // (Si tienes más de 100 alumnos, avísame para activar el modo por lotes de nuevo).
-
+    // A4 en Landscape (Horizontal) mide 297mm x 210mm
     const pdf = new jsPDF('l', 'mm', 'a4');
 
-    // --- MEDIDAS EXACTAS ---
-    const cardWidth = 98;
-    const cardHeight = 155;
-    const marginLeft = 1;
-    const gap = 0.5;
-    const marginY = 15;
+    // --- NUEVAS MEDIDAS EXACTAS (9.5 x 6.0 cm) ---
+    const cardWidth = 95;
+    const cardHeight = 60;
 
-    const posiciones = [
-      [marginLeft, marginY],
-      [marginLeft + cardWidth + gap, marginY],
-      [marginLeft + (cardWidth * 2) + (gap * 2), marginY]
-    ];
+    const startX = 5; // Margen izquierdo de la hoja
+    const startY = 10; // Margen superior de la hoja
+    const gapX = 2; // Espacio entre carnets horizontal
+    const gapY = 5; // Espacio entre carnets vertical
+
+    // Generamos una grilla de 3x3 (Caben 9 carnets por hoja A4)
+    const posiciones = [];
+    for (let fila = 0; fila < 3; fila++) {
+      for (let col = 0; col < 3; col++) {
+        posiciones.push([
+          startX + col * (cardWidth + gapX),
+          startY + fila * (cardHeight + gapY)
+        ]);
+      }
+    }
 
     const container = document.getElementById('contenedor-carnets-masivos');
     if (!container) {
@@ -118,32 +192,26 @@ export class AlumnoListComponent implements OnInit {
       if (!carnetElement) continue;
 
       try {
-        // === EL PUNTO DULCE DE CALIDAD ===
         const canvas = await html2canvas(carnetElement, {
-          scale: 3,           // 3 es CALIDAD DE IMPRESIÓN (300 DPI aprox)
+          scale: 3,
           logging: false,
           useCORS: true,
           backgroundColor: null
         });
 
-        // === LA CLAVE DEL AHORRO DE MEMORIA ===
-        // Usamos JPEG al 90% (0.9). 
-        // Se ve nítido, pero pesa 10 veces menos que PNG.
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-        const posIndex = cardsInPage % 3;
+        const posIndex = cardsInPage % 9; // 9 carnets por página
         const [x, y] = posiciones[posIndex];
 
-        if (cardsInPage > 0 && cardsInPage % 3 === 0) {
+        // Si ya llenamos 9 carnets, creamos una nueva página
+        if (cardsInPage > 0 && cardsInPage % 9 === 0) {
           pdf.addPage();
         }
 
-        // IMPORTANTE: Decirle al PDF que es JPEG
         pdf.addImage(imgData, 'JPEG', x, y, cardWidth, cardHeight);
-
         cardsInPage++;
 
-        // Pequeña pausa para no bloquear la pantalla
         if (i % 5 === 0) await new Promise(r => setTimeout(r, 20));
 
       } catch (e) {

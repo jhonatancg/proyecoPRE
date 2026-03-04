@@ -1,0 +1,66 @@
+/* BANNER HERO */
+.welcome-area {
+    width: 100%;
+    min-height: 380px;
+    background-size: cover !important;
+    background-position: center !important;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 0;
+    margin-top: -10px;
+    /* Pequeño ajuste por si queda una línea blanca arriba */
+}
+
+/* TARJETAS */
+.facility-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.facility-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Wrapper de imagen para evitar saltos */
+.img-wrapper {
+    height: 200px;
+    overflow: hidden;
+    background-color: #e0e0e0;
+}
+
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.facility-card:hover .img-wrapper img {
+    transform: scale(1.1);
+}
+
+/* ICONOS */
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.bg-light-blue {
+    background-color: #e3f2fd;
+}
+
+.bg-light-green {
+    background-color: #e8f5e9;
+}
+
+.bg-light-orange {
+    background-color: #fff8e1;
+}

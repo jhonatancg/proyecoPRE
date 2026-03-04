@@ -7,6 +7,9 @@ export interface Alumno {
     celular: string;
     apoderado: string;
     cel_apoderado: string;
+
+    nivel?: string;
+    seccion?: string;
 }
 
 export interface AlumnoResponse {

@@ -1,37 +1,44 @@
 <div class="carnet-backdrop pb-4" *ngIf="alumno">
 
-    <div class="carnet-container shadow-lg" id="carnetImprimir">
+    <div class="carnet-container shadow-lg horizontal" id="carnetImprimir">
 
         <div class="carnet-header">
-            <div class="school-name"><img src="assets/img/icono-pre.png" class="logo-pre" alt="Colegio LA PRE"> Colegio
-                LA PRE</div>
-            <div class="school-subtitle">Carnet de Estudiante</div>
+            <div class="header-left">
+                <img src="assets/img/icono-pre.png" class="logo-pre" alt="Colegio LA PRE">
+            </div>
+            <div class="header-right">
+                <div class="school-name">Colegio LA PRE</div>
+                <div class="school-subtitle">Carnet de Estudiante</div>
+            </div>
         </div>
 
         <div class="carnet-body">
 
-            <div class="photo-frame">
-                <i class="bi bi-person-fill"></i>
+            <div class="body-col photo-col">
+                <div class="photo-frame shadow-sm">
+                    <i class="bi bi-person-fill"></i>
+                </div>
             </div>
 
-            <h2 class="student-name">
-                {{ alumno.nombres }}
-                <br>
-                <span class="student-lastname">{{ alumno.apellidos }}</span>
-            </h2>
+            <div class="body-col data-col">
+                <h2 class="student-name">
+                    <span class="student-lastname">{{ alumno.apellidos }}</span>
+                    <span class="student-firstname">{{ alumno.nombres }}</span>
+                </h2>
 
-            <div class="student-id-box">
-                <span class="id-label">DNI / CÓDIGO</span>
-                <span class="id-value">{{ alumno.dni_ce || alumno.dni }}</span>
+                <div class="student-grade-box mt-2">
+                    <span class="grade-label">GRADO Y SECCIÓN</span>
+                    <span class="grade-value">{{ alumno.nivel || 'PRE' }} "{{ alumno.seccion || 'A' }}"</span>
+                </div>
             </div>
 
-            <hr class="divider">
-
-            <div class="qr-wrapper">
-                <ngx-qrcode-styling [config]="config"></ngx-qrcode-styling>
+            <div class="body-col qr-col">
+                <div class="qr-wrapper shadow-sm">
+                    <ngx-qrcode-styling [config]="config"></ngx-qrcode-styling>
+                </div>
+                <p class="scan-instruction">Escanear al ingresar</p>
             </div>
 
-            <p class="scan-instruction">Escanea este código al ingresar</p>
         </div>
 
         <div class="carnet-footer">
@@ -42,10 +49,8 @@
     <div class="actions mt-4 d-print-none text-center" *ngIf="!ocultarAcciones">
         <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="imprimirCarnet()"
             [disabled]="generandoPDF">
-
             <i class="bi me-2" [ngClass]="generandoPDF ? 'bi-hourglass-split' : 'bi-file-earmark-pdf-fill'"></i>
             {{ generandoPDF ? 'Generando PDF...' : 'Descargar Carnet PDF' }}
-
         </button>
     </div>
 

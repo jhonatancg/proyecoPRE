@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Nivel } from '../models/nivel.interface';
+import { environment } from '../environment/environmet';
 
 @Injectable({
     providedIn: 'root'
 })
 export class NivelService {
 
-    private apiUrl = 'http://localhost:3000/api/niveles';
+    private apiUrl = `${environment.apiUrl}/niveles`;
 
     constructor(private http: HttpClient) { }
 

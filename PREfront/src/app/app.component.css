@@ -4,16 +4,22 @@
     height: 100vh;
     background: linear-gradient(180deg, #0d47a1 0%, #1565c0 100%);
     color: white;
-    /* POSICIONAMIENTO */
+    /* POSICIONAMIENTO FIJO */
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 9999;
-    /* Siempre encima */
+    z-index: 1050;
+    /* Z-Index alto */
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px 0;
     overflow-y: auto;
-    /* Scroll si el menú es largo */
+    transition: left 0.3s ease;
+    /* Transición suave para ocultar/mostrar */
+}
+
+/* EN PC: Cuando está cerrado, se mueve a la izquierda */
+.sidebar.closed {
+    left: -260px;
 }
 
 /* --- CABECERA DEL MENÚ --- */
@@ -22,22 +28,41 @@
     padding-bottom: 20px;
     margin-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
 }
 
-/* Imagen del logo */
+/* Botón cerrar en móvil */
+.sidebar-close {
+    background: transparent;
+    border: none;
+    color: white;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+}
+
 .sidebar-header img {
     max-width: 70px;
     height: auto;
     object-fit: contain;
 }
 
-/* Texto + logo alineados */
 .sidebar-header h5 {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     margin: 0;
+}
+
+.menu-section-title {
+    padding: 10px 25px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 /* --- ENLACES DEL MENÚ --- */
@@ -61,7 +86,6 @@
     background-color: rgba(255, 255, 255, 0.1);
     color: white;
     padding-left: 30px;
-    /* efecto deslizante */
 }
 
 .nav-link.active {
@@ -72,14 +96,65 @@
 }
 
 /* --- CONTENIDO PRINCIPAL --- */
-.content-area {
+.dashboard-content {
     margin-left: 260px;
-    /* espacio del sidebar */
-    padding: 30px;
+    /* Espacio reservado para el sidebar */
+    padding: 0;
+    /* Sin padding extra */
     background-color: #f5f9ff;
     min-height: 100vh;
-    width: calc(100% - 260px);
-    /* evita solapamiento del sidebar */
+    width: auto;
+    /* Ocupa el resto */
     position: relative;
     z-index: 1;
+    transition: margin-left 0.3s ease;
+    /* Transición suave */
+}
+
+/* EN PC: Cuando el menú se cierra, el contenido ocupa todo (margen 0) */
+.dashboard-content.expanded {
+    margin-left: 0;
+}
+
+/* Overlay para fondo oscuro en móvil */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* ================================================= */
+/* === RESPONSIVE (MÓVIL / TABLET < 992px) === */
+/* ================================================= */
+
+@media (max-width: 991.98px) {
+
+    /* 1. Sidebar oculto por defecto en móvil */
+    .sidebar {
+        left: -260px;
+    }
+
+    /* 2. Si tiene clase active, se muestra */
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* 3. El contenido siempre ocupa el 100% en móvil (margen 0) */
+    .dashboard-content {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    /* 4. Overlay visible si activo */
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
 }

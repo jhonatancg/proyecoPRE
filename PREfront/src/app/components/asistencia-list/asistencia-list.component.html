@@ -1,94 +1,80 @@
 <div class="dashboard-container fade-in">
     <div class="container-fluid">
-
         <div class="main-card">
-
             <div class="card-header-actions">
-                <h3 class="page-title">
-                    <i class="bi bi-calendar2-check"></i>
-                    Reporte de Asistencia
-                </h3>
-                <div *ngIf="cargando" class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                <h3 class="page-title"><i class="bi bi-calendar2-check"></i> Reporte de Asistencia</h3>
+                <div *ngIf="cargando" class="spinner-border text-primary spinner-border-sm"></div>
             </div>
 
             <div class="filters-section">
                 <div class="row g-3">
-
                     <div class="col-md-3">
-                        <label class="form-label">Nivel Académico</label>
+                        <label class="form-label">Grado</label>
                         <select class="form-select" [(ngModel)]="nivelSeleccionado" (change)="onNivelChange()">
                             <option [ngValue]="null">-- Seleccione --</option>
-                            <option *ngFor="let nivel of niveles" [value]="nivel.id">
-                                {{ nivel.nombre }}
-                            </option>
+                            <option *ngFor="let n of niveles" [value]="n.id">{{ n.nombre }}</option>
                         </select>
                     </div>
-
                     <div class="col-md-3">
                         <label class="form-label">Sección</label>
                         <select class="form-select" [(ngModel)]="seccionSeleccionada" [disabled]="!nivelSeleccionado">
                             <option [ngValue]="null">-- Seleccione --</option>
-                            <option *ngFor="let sec of seccionesFiltradas" [value]="sec.id">
-                                {{ sec.nombre }} - {{ sec.nombre_nivel }}
-                            </option>
+                            <option *ngFor="let s of seccionesFiltradas" [value]="s.id">{{ s.nombre }}</option>
                         </select>
                     </div>
-
                     <div class="col-md-3">
-                        <label class="form-label">Fecha de Reporte</label>
+                        <label class="form-label">Fecha</label>
                         <input type="date" class="form-control" [(ngModel)]="fechaSeleccionada">
                     </div>
-
                     <div class="col-md-3 d-flex align-items-end">
                         <button class="btn-search" (click)="buscarAsistencias()"
-                            [disabled]="cargando || !nivelSeleccionado || !seccionSeleccionada">
+                            [disabled]="cargando || !seccionSeleccionada">
                             <i class="bi bi-search"></i> Consultar
                         </button>
                     </div>
-
                 </div>
             </div>
 
             <div class="table-container" *ngIf="asistencias.length > 0; else emptyState">
-
                 <div class="d-flex justify-content-between align-items-center px-4 py-3 bg-white border-bottom">
-                    <span class="text-muted small fw-bold">
-                        RESULTADOS: {{ asistencias.length }} ALUMNOS
-                    </span>
-                    <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-2"
-                        (click)="exportarPDF()">
-                        <i class="bi bi-file-pdf"></i> Exportar PDF
+                    <span class="text-muted fw-bold">RESULTADOS: {{ asistencias.length }}</span>
+                    <button class="btn btn-sm btn-outline-danger" (click)="exportarPDF()">
+                        <i class="bi bi-file-pdf"></i> PDF
                     </button>
                 </div>
-
                 <div class="table-responsive">
-                    <table class="table custom-table mb-0">
+                    <table class="table custom-table mb-0 align-middle">
                         <thead>
                             <tr>
-                                <th width="5%" class="text-center">#</th>
-                                <th width="40%">Alumno</th>
-                                <th width="20%" class="text-center">Hora Ingreso</th>
-                                <th width="20%" class="text-center">Estado</th>
+                                <th class="text-center">#</th>
+                                <th>Alumno</th>
+                                <th class="text-center">Hora</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let item of asistencias; let i = index" class="table-row-hover">
-                                <td class="text-center text-muted fw-bold">{{ i + 1 }}</td>
+                            <tr *ngFor="let item of asistencias; let i = index">
+                                <td class="text-center fw-bold">{{ i + 1 }}</td>
                                 <td>
                                     <div class="d-flex flex-column">
                                         <span class="student-name">{{ item.apellidos }}, {{ item.nombres }}</span>
-                                        <small><span class="dni-text">{{ item.dni_ce }}</span></small>
+                                        <small class="text-muted">{{ item.dni_ce }}</small>
                                     </div>
                                 </td>
                                 <td class="text-center font-monospace">{{ item.hora_entrada }}</td>
                                 <td class="text-center">
                                     <span class="status-badge" [ngClass]="{
-                                            'status-puntual': item.situacion === 'PUNTUAL',
-                                            'status-tarde': item.situacion === 'TARDE',
-                                            'status-falta': item.situacion === 'FALTA'
-                                        }">
-                                        {{ item.situacion }}
-                                    </span>
+                                        'status-puntual': item.situacion === 'PUNTUAL',
+                                        'status-tarde': item.situacion === 'TARDE',
+                                        'status-falta': item.situacion === 'FALTA',
+                                        'status-justificada': item.situacion.includes('JUSTIFICADA')
+                                    }">{{ item.situacion }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary" (click)="abrirModalEditar(item)">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -97,23 +83,35 @@
             </div>
 
             <ng-template #emptyState>
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="bi bi-clipboard-data"></i>
-                    </div>
-
-                    <div *ngIf="busquedaRealizada && !cargando">
-                        <h5 class="empty-text">No se encontraron registros.</h5>
-                        <p class="text-muted small">Intenta con otra fecha o verifica la asistencia.</p>
-                    </div>
-
-                    <div *ngIf="!busquedaRealizada && !cargando">
-                        <h5 class="empty-text">Seleccione los filtros para ver el reporte.</h5>
-                        <p class="text-muted small">Elija Nivel, Sección y Fecha, luego presione "Consultar".</p>
-                    </div>
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <h5 class="text-muted mt-2">{{ busquedaRealizada ? 'No hay registros.' : 'Seleccione filtros.' }}
+                    </h5>
                 </div>
             </ng-template>
+        </div>
+    </div>
+</div>
 
+<div class="modal-backdrop fade show" *ngIf="mostrarModal"></div>
+<div class="modal fade show d-block" *ngIf="mostrarModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Modificar Asistencia</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Alumno:</strong> {{ asistenciaEditar?.apellidos }}, {{ asistenciaEditar?.nombres }}</p>
+                <label class="form-label">Situación</label>
+                <select class="form-select" [(ngModel)]="nuevaSituacion">
+                    <option *ngFor="let est of listaSituaciones" [value]="est">{{ est }}</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+                <button class="btn btn-primary" (click)="guardarCambio()">Guardar</button>
+            </div>
         </div>
     </div>
 </div>

@@ -6,6 +6,7 @@ const {
     obtenerAsistencias,
     obtenerAsistenciasHoy,
     obtenerAsistenciaPorAula,
+    justificarFalta,
     eliminarAsistencia,
     reenviarNotificacionesHoy
 } = require('../controllers/asistenciaController');
@@ -82,6 +83,7 @@ router.get('/', verificarToken, obtenerAsistencias);
  */
 router.get('/hoy', verificarToken, obtenerAsistenciasHoy);
 router.get('/aula/:nivel_id/:seccion_id/:fecha', verificarToken, obtenerAsistenciaPorAula);
+router.post('/justificar', verificarToken, justificarFalta);
 
 module.exports = router;
 

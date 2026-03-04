@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; // Asegúrate que la ruta sea correcta
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +17,6 @@ export class LoginComponent implements OnInit {
   error: string = '';
   returnUrl: string = '/home';
 
-  // NUEVO: Variable para controlar la visibilidad de la contraseña
   showPassword: boolean = false;
 
   constructor(
@@ -34,12 +33,19 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+
     if (this.authService.isAuthenticated()) {
-      this.router.navigate([this.returnUrl]);
+      const usuario = this.authService.getCurrentUser();
+      if (this.esRolPermitido(usuario?.rol)) {
+        // MODIFICACIÓN AQUÍ: Redirigir a /asistencias si es auxiliar
+        const rutaDestino = usuario?.rol === 'AUXILIAR' ? '/asistencias' : this.returnUrl;
+        this.router.navigate([rutaDestino]);
+      } else {
+        this.authService.logout(); // Si no es permitido, cerramos la sesión antigua
+      }
     }
   }
 
-  // NUEVO: Función para alternar el tipo de input (password/text)
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
@@ -56,7 +62,16 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         if (response.success) {
-          this.router.navigate([this.returnUrl]);
+          if (this.esRolPermitido(response.usuario.rol)) {
+            // MODIFICACIÓN AQUÍ: Redirigir a /asistencias si es auxiliar
+            const rutaDestino = response.usuario.rol === 'AUXILIAR' ? '/asistencias' : this.returnUrl;
+            this.router.navigate([rutaDestino]);
+          } else {
+            this.error = 'Acceso denegado: Solo personal autorizado (Auxiliares y Admin).';
+            this.authService.logout();
+            this.loading = false;
+          }
+
         }
       },
       error: (err) => {
@@ -64,9 +79,15 @@ export class LoginComponent implements OnInit {
         this.loading = false;
       },
       complete: () => {
-        this.loading = false;
+        // Solo quitamos el loading si hubo error (si es éxito, la navegación ocurre)
+        if (this.error) this.loading = false;
       }
     });
+  }
+
+  private esRolPermitido(rol: string | undefined): boolean {
+    const rolesPermitidos = ['ADMIN', 'ADMINISTRADOR', 'AUXILIAR'];
+    return rol ? rolesPermitidos.includes(rol) : false;
   }
 
   isFieldInvalid(fieldName: string): boolean {

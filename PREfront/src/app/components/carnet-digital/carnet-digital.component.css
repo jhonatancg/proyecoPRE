@@ -1,8 +1,7 @@
 /* =========================================
-   ESTILOS DE VISUALIZACIÓN (EN PANTALLA)
+   ESTILOS DE VISUALIZACIÓN (HORIZONTAL)
    ========================================= */
 
-/* Contenedor que centra todo */
 .carnet-backdrop {
     display: flex;
     flex-direction: column;
@@ -13,135 +12,181 @@
     width: 100%;
 }
 
-/* La Tarjeta Física */
-.carnet-container {
-    width: 320px;
-    height: 500px;
-    /* Reduje un poco la altura para que quepa mejor */
+/* La Tarjeta Física (Proporción 9.5 x 6 cm) */
+.carnet-container.horizontal {
+    width: 380px;
+    height: 240px;
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
     border: 1px solid #e0e0e0;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-
-    /* IMPORTANTE: Esto asegura que el contenido no se desborde */
     display: flex;
     flex-direction: column;
 }
 
 /* Encabezado Azul */
 .carnet-header {
-    background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+    background: linear-gradient(90deg, #0d47a1 0%, #1976d2 100%);
     color: white;
-    padding: 15px 10px;
-    text-align: center;
-    /* Curva inferior */
-    border-bottom-left-radius: 50% 20px;
-    border-bottom-right-radius: 50% 20px;
-    height: 100px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    height: 55px;
     flex-shrink: 0;
-    /* No encoger */
+    border-bottom: 3px solid #ffca28;
+    /* Toque dorado/amarillo institucional */
+}
+
+.header-left .logo-pre {
+    height: 35px;
+    width: auto;
+    object-fit: contain;
+    margin-right: 12px;
+    background: white;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .school-name {
     font-size: 1.1rem;
     font-weight: 800;
     text-transform: uppercase;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    line-height: 1;
     margin-bottom: 2px;
 }
 
 .school-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.65rem;
+    font-weight: 500;
     opacity: 0.9;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-/* Cuerpo del Carnet */
+/* Cuerpo del Carnet (3 Columnas) */
 .carnet-body {
-    padding: 0 20px;
-    text-align: center;
-    margin-top: -40px;
-    /* Subir foto */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
     flex-grow: 1;
-    /* Ocupar espacio disponible */
-    position: relative;
-    z-index: 2;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10,10 L90,90 M90,10 L10,90" stroke="%23f0f4f8" stroke-width="2" fill="none"/></svg>');
+    background-size: 150px;
+    background-position: center;
 }
 
-/* Foto Circular */
+/* Columna 1: Foto */
+.photo-col {
+    width: 25%;
+    display: flex;
+    justify-content: center;
+}
+
 .photo-frame {
-    width: 80px;
-    height: 80px;
+    width: 75px;
+    height: 95px;
     background-color: #f5f9ff;
-    border: 2px solid white;
-    border-radius: 50%;
-    margin: 0 auto 10px auto;
-    transform: translateY(15px);
+    border: 2px solid #0d47a1;
+    border-radius: 8px;
+    /* Foto rectangular con bordes redondeados */
     display: flex;
     align-items: center;
     justify-content: center;
     color: #1976d2;
-    font-size: 3rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 3.5rem;
+    background-image: linear-gradient(to bottom, #f5f9ff, #e3f2fd);
+}
+
+/* Columna 2: Datos (Centro) */
+.data-col {
+    width: 45%;
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .student-name {
-    transform: translateY(10px);
-    font-size: 1rem;
-    font-weight: 400;
-    color: #455a64;
+    margin: 0 0 8px 0;
     line-height: 1.1;
-    margin-bottom: 5px;
 }
 
 .student-lastname {
     font-weight: 800;
     color: #0d47a1;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     text-transform: uppercase;
     display: block;
-    margin-bottom: 8px;
 }
 
-/* Caja del DNI */
-.student-id-box {
+.student-firstname {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #455a64;
+    text-transform: capitalize;
+}
+
+/* Caja de Grado y Sección */
+.student-grade-box {
     background-color: #e3f2fd;
-    color: #0d47a1;
-    padding: 5px 15px;
-    border-radius: 50px;
+    border-left: 4px solid #0d47a1;
+    padding: 4px 8px;
+    border-radius: 4px;
     display: inline-block;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transform: translateY(15px);
-    margin-bottom: 10px;
 }
 
-.id-label {
-    font-size: 0.65rem;
+.grade-label {
+    font-size: 0.55rem;
     display: block;
     color: #1976d2;
     text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 1px;
 }
 
-.divider {
-    border: 0;
-    height: 1px;
-    background: #eeeeee;
-    margin: 10px 0;
+.grade-value {
+    color: #0d47a1;
+    font-weight: 800;
+    font-size: 0.85rem;
 }
 
-/* QR */
+/* Columna 3: QR */
+.qr-col {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .qr-wrapper {
+    background: white;
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 4px;
     display: flex;
     justify-content: center;
-    margin-bottom: 5px;
+    align-items: center;
 }
 
 .scan-instruction {
-    font-size: 0.7rem;
-    color: #90a4ae;
-    margin-top: 2px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: #0d47a1;
+    margin: 0;
+    text-transform: uppercase;
+    text-align: center;
 }
 
 /* Pie de Página */
@@ -150,60 +195,51 @@
     color: white;
     text-align: center;
     font-size: 0.65rem;
-    padding: 8px 0;
+    padding: 4px 0;
     letter-spacing: 1px;
     flex-shrink: 0;
 }
 
 /* =========================================
-   REGLAS DE IMPRESIÓN (SOLUCIÓN HOJA BLANCA)
+   REGLAS DE IMPRESIÓN MASIVA
    ========================================= */
 @media print {
-
-    /* 1. Forzar impresión de fondos y colores exactos */
     body {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         background-color: white !important;
     }
 
-    /* 2. Ocultar TODO lo que no sea el carnet */
     body * {
         visibility: hidden;
     }
 
-    /* 3. Hacer visible SOLO el contenedor del carnet y su contenido */
     #carnetImprimir,
     #carnetImprimir * {
         visibility: visible !important;
     }
 
-    /* 4. Ocultar botones y scrollbars */
     .d-print-none,
     .modal-backdrop,
     .btn-close {
         display: none !important;
     }
 
-    /* 5. Posicionar el Carnet en la hoja */
-    /* Lo sacamos del flujo normal y lo pegamos a la hoja */
-    .carnet-container {
+    .carnet-container.horizontal {
         position: fixed;
         left: 50%;
         top: 20px;
         transform: translateX(-50%);
-        /* Centrado horizontal real */
         margin: 0 !important;
         box-shadow: none !important;
         border: 1px solid #ccc !important;
-
-        /* Aseguramos que se vea */
         z-index: 999999 !important;
-        width: 11cm !important;
-        height: 17.5cm !important;
+
+        /* MEDIDAS REALES PARA IMPRESIÓN */
+        width: 9.5cm !important;
+        height: 6.0cm !important;
     }
 
-    /* Asegurar que el modal no estorbe */
     .modal {
         position: absolute;
         left: 0;

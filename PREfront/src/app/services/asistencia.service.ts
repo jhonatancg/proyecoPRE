@@ -21,7 +21,10 @@ export class AsistenciaService {
   }
 
   obtenerAsistenciasPorAula(nivelId: number, seccionId: number, fecha: string): Observable<any> {
-    // Llama a la ruta: /api/asistencias/aula/:nivel/:seccion/:fecha
     return this.http.get<any>(`${this.apiUrl}/aula/${nivelId}/${seccionId}/${fecha}`);
+  }
+
+  justificarFalta(data: { alumno_id: number, fecha: string, situacion: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/justificar`, data);
   }
 }

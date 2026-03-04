@@ -60,6 +60,7 @@ const obtenerMatriculas = async (req, res) => {
         const query = `
             SELECT 
                 m.id, 
+                m.alumno_id,  -- ¡ESTE ES EL CAMBIO CLAVE PARA ANGULAR!
                 m.fecha_matricula, 
                 m.situacion,
                 a.nombres AS alumno_nombres, 
@@ -107,6 +108,7 @@ const obtenerMatriculasPorAula = async (req, res) => {
         const query = `
             SELECT 
                 m.id, 
+                m.alumno_id, -- Lo agrego aquí también por si luego lo necesitas
                 m.fecha_matricula, 
                 m.situacion,
                 a.nombres AS alumno_nombres, 

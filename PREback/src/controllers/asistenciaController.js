@@ -25,18 +25,14 @@ const registrarAsistencia = async (req, res) => {
         const alumno = alumnoFound[0];
         const alumno_id = alumno.id;
 
-        // --- CAMBIO AQUÍ: Definimos la hora actual ANTES de validar duplicados ---
         const ahora = new Date();
         const esTurnoManana = ahora.getHours() < 12;
 
         let queryDuplicado = '';
 
-        // Validamos duplicado SEGÚN EL TURNO ACTUAL
         if (esTurnoManana) {
-            // Si es de mañana, verificamos si ya tiene un registro antes de las 12:00
             queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada < '12:00:00'";
         } else {
-            // Si es de tarde, verificamos si ya tiene un registro después de las 12:00
             queryDuplicado = "SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = CURDATE() AND estado = 1 AND hora_entrada >= '12:00:00'";
         }
 
@@ -48,20 +44,25 @@ const registrarAsistencia = async (req, res) => {
                 mensaje: `El alumno ${alumno.nombres} ya registró asistencia en el turno ${esTurnoManana ? 'MAÑANA' : 'TARDE'}.`
             });
         }
-        // --- FIN CAMBIO VALIDACIÓN ---
-
 
         // --- LÓGICA DE HORARIOS Y TARDANZAS ---
         const horaLimite = new Date();
+        const diaSemana = ahora.getDay(); // 0 = Domingo, 6 = Sábado
 
-        // Verificamos si es turno mañana o tarde para definir el límite
         if (esTurnoManana) {
-            // Horario Mañana: Límite 7:02 AM
-            horaLimite.setHours(7, 2, 0);
+            // Verificamos si es Sábado (6)
+            if (diaSemana === 6) {
+                // Sábado: Límite 7:30 AM
+                horaLimite.setHours(7, 30, 0);
+            } else {
+                // Lunes a Viernes: Límite 7:02 AM
+                horaLimite.setHours(7, 2, 0);
+            }
         } else {
             // Horario Tarde: Límite 4:10 PM (16:10)
             horaLimite.setHours(16, 10, 0);
         }
+        // ----------------------------------------------------
 
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
 
@@ -77,7 +78,6 @@ const registrarAsistencia = async (req, res) => {
             const icono = situacionFinal === 'PUNTUAL' ? '✅' : '⚠️';
             const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*`;
 
-            // Enviamos sin await para no demorar la respuesta al frontend
             enviarMensaje(alumno.cel_apoderado, textoMensaje);
         }
 
@@ -128,7 +128,7 @@ const obtenerAsistencias = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error al obtener asistencias:');
+        console.error('Error al obtener asistencias:', error);
         res.status(500).json({
             success: false,
             mensaje: 'Error al obtener el reporte de asistencias',
@@ -162,7 +162,7 @@ const obtenerAsistenciasHoy = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error al obtener asistencias de hoy:');
+        console.error('Error al obtener asistencias de hoy:', error);
         res.status(500).json({
             success: false,
             mensaje: 'Error al obtener asistencias del día',
@@ -175,16 +175,9 @@ const obtenerAsistenciaPorAula = async (req, res) => {
     try {
         const { nivel_id, seccion_id, fecha } = req.params;
 
-        console.log('--- SOLICITUD DE REPORTE ---');
-        console.log(`1. Parámetros recibidos: Nivel=${nivel_id}, Sección=${seccion_id}, Fecha=${fecha}`);
-
-        if (!nivel_id || !seccion_id || !fecha) {
-            return res.status(400).json({ success: false, mensaje: "Faltan parámetros" });
-        }
-
-        // Esta consulta busca ALUMNOS MATRICULADOS y cruza con ASISTENCIA
         const query = `
             SELECT 
+                asi.id AS asistencia_id, 
                 alu.id AS alumno_id,
                 alu.nombres,
                 alu.apellidos,
@@ -198,34 +191,51 @@ const obtenerAsistenciaPorAula = async (req, res) => {
             INNER JOIN secciones sec ON mat.seccion_id = sec.id
             INNER JOIN niveles niv ON sec.nivel_id = niv.id
             LEFT JOIN asistencias asi ON alu.id = asi.alumno_id AND asi.fecha = ? AND asi.estado = 1
-            WHERE 
-                sec.nivel_id = ? 
-                AND mat.seccion_id = ? 
-                AND mat.estado = 1
+            WHERE sec.nivel_id = ? AND mat.seccion_id = ? AND mat.estado = 1
             ORDER BY alu.apellidos ASC
         `;
 
-        const [asistencias] = await db.query(query, [fecha, nivel_id, seccion_id]);
-
-        console.log(`2. Alumnos encontrados en esa aula: ${asistencias.length}`);
-
-        if (asistencias.length === 0) {
-            console.log('⚠️ ADVERTENCIA: No se encontraron alumnos.');
-            console.log('   - Verifica que existan filas en la tabla "matriculas" para la seccion_id:', seccion_id);
-            console.log('   - Verifica que esas matrículas tengan estado = 1');
-        } else {
-            console.log('✅ Datos enviados al frontend correctamente.');
-        }
-
-        res.json({
-            success: true,
-            count: asistencias.length,
-            data: asistencias
-        });
+        const [data] = await db.query(query, [fecha, nivel_id, seccion_id]);
+        res.json({ success: true, count: data.length, data });
 
     } catch (error) {
-        console.error('❌ Error CRÍTICO en obtenerAsistenciaPorAula:', error);
-        res.status(500).json({ success: false, mensaje: 'Error del servidor', error: error.message });
+        console.error(error);
+        res.status(500).json({ success: false, mensaje: 'Error al obtener reporte', error: error.message });
+    }
+};
+
+const justificarFalta = async (req, res) => {
+    try {
+        const { alumno_id, fecha, situacion } = req.body;
+
+        if (!alumno_id || !fecha || !situacion) {
+            return res.status(400).json({ success: false, mensaje: "Faltan datos (alumno, fecha o situación)" });
+        }
+
+        // Verificamos si ya existe registro ese día (para saber si es UPDATE o INSERT)
+        const [existente] = await db.query(
+            'SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = ? AND estado = 1',
+            [alumno_id, fecha]
+        );
+
+        if (existente.length > 0) {
+            // SI YA EXISTE (Ej: Llegó tarde y queremos justificarlo) -> ACTUALIZAMOS
+            const idAsistencia = existente[0].id;
+            await db.query('UPDATE asistencias SET situacion = ? WHERE id = ?', [situacion, idAsistencia]);
+            res.json({ success: true, mensaje: "Asistencia actualizada correctamente." });
+        } else {
+            // SI NO EXISTE (Tiene FALTA y queremos justificarla) -> CREAMOS EL REGISTRO
+            // Ponemos hora '00:00:00' para indicar que no marcó QR
+            await db.query(
+                'INSERT INTO asistencias (alumno_id, fecha, hora_entrada, situacion, estado) VALUES (?, ?, "00:00:00", ?, 1)',
+                [alumno_id, fecha, situacion]
+            );
+            res.json({ success: true, mensaje: "Justificación creada exitosamente." });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, mensaje: 'Error al procesar justificación', error: error.message });
     }
 };
 const eliminarAsistencia = async (req, res) => {
@@ -250,12 +260,10 @@ const eliminarAsistencia = async (req, res) => {
     }
 };
 
-// --- NUEVA FUNCIÓN PARA REENVIAR NOTIFICACIONES PENDIENTES ---
 const reenviarNotificacionesHoy = async (req, res) => {
     try {
         console.log('🔄 Iniciando reenvío masivo de notificaciones de HOY...');
 
-        // 1. Obtenemos todas las asistencias válidas de hoy
         const [asistenciasHoy] = await db.query(`
             SELECT 
                 a.id, 
@@ -277,24 +285,20 @@ const reenviarNotificacionesHoy = async (req, res) => {
         let errores = 0;
         const fechaLegible = new Date().toLocaleDateString('es-PE');
 
-        // 2. Iteramos y enviamos con pausa de seguridad
         for (const registro of asistenciasHoy) {
-
             if (registro.cel_apoderado) {
                 const icono = registro.situacion === 'PUNTUAL' ? '✅' : '⚠️';
-                const horaLegible = registro.hora_entrada; // Usamos la hora que ya está en BD
+                const horaLegible = registro.hora_entrada;
 
                 const textoMensaje = `Hola, por problemas de red, recién se está enviando la notificación de asistencia. El alumno *${registro.nombres} ${registro.apellidos}* asistió con normalidad esta mañana.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
 
                 console.log(`📤 Reenviando a: ${registro.nombres} (${registro.cel_apoderado})...`);
 
-                // Enviar mensaje
                 const exito = await enviarMensaje(registro.cel_apoderado, textoMensaje);
 
                 if (exito) enviados++;
                 else errores++;
 
-                // ⚠️ PAUSA DE 2 SEGUNDOS para evitar bloqueo por spam
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
@@ -324,6 +328,7 @@ module.exports = {
     obtenerAsistencias,
     obtenerAsistenciasHoy,
     obtenerAsistenciaPorAula,
+    justificarFalta,
     eliminarAsistencia,
     reenviarNotificacionesHoy
 };

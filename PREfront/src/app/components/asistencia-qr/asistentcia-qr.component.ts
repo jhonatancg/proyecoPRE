@@ -174,7 +174,7 @@ export class AsistentiaQrComponent implements AfterViewInit, OnDestroy {
 
   salir() {
     this.apagarCamara();
-    this.router.navigate(['/']);
+    this.router.navigate(['/asistencias']);
   }
 
   cambiarCamara() {
