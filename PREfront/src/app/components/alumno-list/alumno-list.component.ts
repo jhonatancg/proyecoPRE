@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { Alumno } from '../../models/alumno.interface';
 import { AlumnoService } from '../../services/alumno.service';
 import { AuthService } from '../../services/auth.service';
 import { MatriculaService } from '../../services/matricula.service';
 
+// Solo importamos el carnet original (pequeño)
 import { CarnetDigitalComponent } from '../carnet-digital/carnet-digital.component';
 
 import jsPDF from 'jspdf';
@@ -15,17 +17,23 @@ import html2canvas from 'html2canvas';
 @Component({
   selector: 'app-alumno-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, CarnetDigitalComponent],
+  imports: [CommonModule, RouterLink, FormsModule, CarnetDigitalComponent],
   templateUrl: './alumno-list.component.html',
   styleUrl: './alumno-list.component.css'
 })
 export class AlumnoListComponent implements OnInit {
   alumnos: Alumno[] = [];
   error: string = '';
+  cargando: boolean = false;
+
+  // --- VARIABLES DE BÚSQUEDA ---
+  terminoBusqueda: string = '';
+  busquedaRealizada: boolean = false;
 
   alumnoSeleccionadoCarnet: Alumno | null = null;
 
-  generandoMasivo: boolean = false;
+  // --- VARIABLES DE DESCARGA MASIVA ---
+  generandoMasivo: boolean = false; // Renombrado a uno solo
   progresoMasivo: string = '';
 
   // --- VARIABLES DE PAGINACIÓN ---
@@ -42,60 +50,105 @@ export class AlumnoListComponent implements OnInit {
     this.cargarAlumnos();
   }
 
+  // ==========================================
+  // LÓGICA DE CARGA Y BÚSQUEDA
+  // ==========================================
   cargarAlumnos(): void {
-    this.alumnoService.obtenerAlumnos().subscribe({
-      next: (resAlumnos) => {
-        let listaAlumnos: Alumno[] = [];
+    this.cargando = true;
+    this.busquedaRealizada = false;
+    this.terminoBusqueda = '';
 
-        if (resAlumnos.success && Array.isArray(resAlumnos.data)) {
-          listaAlumnos = resAlumnos.data;
-        } else if (Array.isArray(resAlumnos)) {
-          listaAlumnos = resAlumnos;
+    this.alumnoService.obtenerAlumnos().subscribe({
+      next: (res) => this.procesarRespuestaAlumnos(res),
+      error: (err) => this.manejarErrorCarga(err)
+    });
+  }
+
+  buscarAlumnos(): void {
+    const termino = this.terminoBusqueda.trim();
+
+    if (!termino) {
+      this.cargarAlumnos();
+      return;
+    }
+
+    this.cargando = true;
+    this.busquedaRealizada = true;
+
+    const esSoloNumeros = /^\d+$/.test(termino);
+
+    if (esSoloNumeros) {
+      this.alumnoService.buscarAlumnoPorDni(termino).subscribe({
+        next: (res) => this.procesarRespuestaAlumnos(res),
+        error: (err) => this.manejarErrorCarga(err)
+      });
+    } else {
+      this.alumnoService.buscarAlumnosPorNombreApellido(termino).subscribe({
+        next: (res) => this.procesarRespuestaAlumnos(res),
+        error: (err) => this.manejarErrorCarga(err)
+      });
+    }
+  }
+
+  limpiarBusqueda(): void {
+    this.cargarAlumnos();
+  }
+
+  private procesarRespuestaAlumnos(resAlumnos: any): void {
+    let listaAlumnos: Alumno[] = [];
+
+    if (resAlumnos.success && Array.isArray(resAlumnos.data)) {
+      listaAlumnos = resAlumnos.data;
+    } else if (Array.isArray(resAlumnos)) {
+      listaAlumnos = resAlumnos;
+    }
+
+    if (listaAlumnos.length === 0) {
+      this.alumnos = [];
+      this.cargando = false;
+      this.currentPage = 1;
+      return;
+    }
+
+    this.matriculaService.obtenerMatriculas().subscribe({
+      next: (resMatriculas) => {
+        let listaMatriculas: any[] = [];
+
+        if (resMatriculas.success && Array.isArray(resMatriculas.data)) {
+          listaMatriculas = resMatriculas.data;
+        } else if (Array.isArray(resMatriculas)) {
+          listaMatriculas = resMatriculas;
         }
 
-        // Una vez que tenemos los alumnos, traemos las matrículas
-        this.matriculaService.obtenerMatriculas().subscribe({
-          next: (resMatriculas) => {
-            let listaMatriculas: any[] = [];
-
-            if (resMatriculas.success && Array.isArray(resMatriculas.data)) {
-              listaMatriculas = resMatriculas.data;
-            } else if (Array.isArray(resMatriculas)) {
-              listaMatriculas = resMatriculas;
-            }
-
-            // CRUCE DE DATOS: Le asignamos a cada alumno su nivel y sección
-            listaAlumnos.forEach(alumno => {
-
-              // SOLUCIÓN 1: Convertimos ambos a Number() para evitar fallos si uno es texto ("1") y otro número (1)
-              const matricula = listaMatriculas.find(m => Number(m.alumno_id) === Number(alumno.id));
-
-              if (matricula) {
-                // SOLUCIÓN 2: Verificamos si el backend te está mandando la info o no
-                alumno.nivel = matricula.nivel || matricula.grado || 'PRE'; // 'PRE' como respaldo
-                alumno.seccion = matricula.seccion || 'A'; // 'A' como respaldo
-              } else {
-                alumno.nivel = 'No Matriculado';
-                alumno.seccion = 'Sin Asignar';
-              }
-            });
-
-            // Guardamos la lista completa y reiniciamos la paginación
-            this.alumnos = listaAlumnos;
-            this.currentPage = 1;
-          },
-          error: (err) => {
-            console.error('Error al cargar matrículas', err);
-            this.alumnos = listaAlumnos;
-            this.currentPage = 1;
+        listaAlumnos.forEach(alumno => {
+          const matricula = listaMatriculas.find(m => Number(m.alumno_id) === Number(alumno.id));
+          if (matricula) {
+            alumno.nivel = matricula.nivel || matricula.grado || 'PRE';
+            alumno.seccion = matricula.seccion || 'A';
+          } else {
+            alumno.nivel = 'No Matriculado';
+            alumno.seccion = 'Sin Asignar';
           }
         });
+
+        this.alumnos = listaAlumnos;
+        this.currentPage = 1;
+        this.cargando = false;
       },
       error: (err) => {
-        console.error('Error al cargar alumnos:', err);
-        this.error = 'No se pudieron cargar los alumnos.';
+        console.error('Error al cargar matrículas', err);
+        this.alumnos = listaAlumnos;
+        this.currentPage = 1;
+        this.cargando = false;
       }
     });
+  }
+
+  private manejarErrorCarga(err: any): void {
+    console.error('Error en la petición:', err);
+    this.error = 'Ocurrió un error al consultar los datos.';
+    this.alumnos = [];
+    this.cargando = false;
   }
 
   // --- MÉTODOS DE PAGINACIÓN ---
@@ -122,13 +175,13 @@ export class AlumnoListComponent implements OnInit {
       this.currentPage = page;
     }
   }
-  // -----------------------------
 
+  // --- ACCIONES INDIVIDUALES ---
   eliminarAlumno(id: number) {
     if (confirm('¿Estás seguro de eliminar este alumno?')) {
       this.alumnoService.eliminarAlumno(id).subscribe({
-        next: (response) => {
-          this.cargarAlumnos(); // Refresca correctamente con los datos cruzados
+        next: () => {
+          this.busquedaRealizada ? this.buscarAlumnos() : this.cargarAlumnos();
         },
         error: (err) => {
           console.error(err);
@@ -146,28 +199,28 @@ export class AlumnoListComponent implements OnInit {
     this.alumnoSeleccionadoCarnet = null;
   }
 
-  async descargarTodosLosCarnets() {
+  // ==============================================================
+  // DESCARGA MASIVA CARNET PEQUEÑO (9.5 x 5.8 cm) - 10 por Hoja
+  // ==============================================================
+  async descargarCarnets() {
     if (this.alumnos.length === 0) return;
 
     this.generandoMasivo = true;
-    this.progresoMasivo = 'Iniciando generación...';
+    this.progresoMasivo = 'Iniciando Carnets...';
 
-    // A4 en Landscape (Horizontal) mide 297mm x 210mm
-    const pdf = new jsPDF('l', 'mm', 'a4');
+    const pdf = new jsPDF('p', 'mm', 'a4');
 
-    // --- NUEVAS MEDIDAS EXACTAS (9.5 x 6.0 cm) ---
     const cardWidth = 95;
-    const cardHeight = 60;
+    const cardHeight = 58;
 
-    const startX = 5; // Margen izquierdo de la hoja
-    const startY = 10; // Margen superior de la hoja
-    const gapX = 2; // Espacio entre carnets horizontal
-    const gapY = 5; // Espacio entre carnets vertical
+    const startX = 7.5;
+    const startY = 3.5;
+    const gapX = 5;
+    const gapY = 0;
 
-    // Generamos una grilla de 3x3 (Caben 9 carnets por hoja A4)
     const posiciones = [];
-    for (let fila = 0; fila < 3; fila++) {
-      for (let col = 0; col < 3; col++) {
+    for (let fila = 0; fila < 5; fila++) {
+      for (let col = 0; col < 2; col++) {
         posiciones.push([
           startX + col * (cardWidth + gapX),
           startY + fila * (cardHeight + gapY)
@@ -176,10 +229,18 @@ export class AlumnoListComponent implements OnInit {
     }
 
     const container = document.getElementById('contenedor-carnets-masivos');
-    if (!container) {
-      this.generandoMasivo = false;
-      return;
-    }
+    if (!container) { this.generandoMasivo = false; return; }
+
+    await this.procesarPDF(pdf, container, posiciones, cardWidth, cardHeight, 10, 'Carnets_Alumnos_9x6.pdf');
+    this.generandoMasivo = false;
+  }
+
+  // ==============================================================
+  // FUNCIÓN REUTILIZABLE PARA GENERAR EL PDF
+  // ==============================================================
+  private async procesarPDF(pdf: jsPDF, container: HTMLElement, posiciones: number[][],
+    cardWidth: number, cardHeight: number, limitPerPage: number, filename: string) {
+
     const wrapperDivs = container.children;
     let cardsInPage = 0;
 
@@ -200,12 +261,10 @@ export class AlumnoListComponent implements OnInit {
         });
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-        const posIndex = cardsInPage % 9; // 9 carnets por página
+        const posIndex = cardsInPage % limitPerPage;
         const [x, y] = posiciones[posIndex];
 
-        // Si ya llenamos 9 carnets, creamos una nueva página
-        if (cardsInPage > 0 && cardsInPage % 9 === 0) {
+        if (cardsInPage > 0 && cardsInPage % limitPerPage === 0) {
           pdf.addPage();
         }
 
@@ -220,7 +279,6 @@ export class AlumnoListComponent implements OnInit {
     }
 
     this.progresoMasivo = 'Finalizando PDF...';
-    pdf.save('Carnets_Masivos_Alumnos.pdf');
-    this.generandoMasivo = false;
+    pdf.save(filename);
   }
 }

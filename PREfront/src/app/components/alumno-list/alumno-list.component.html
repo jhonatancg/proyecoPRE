@@ -1,34 +1,58 @@
 <div class="dashboard-container">
     <div class="main-card shadow-lg">
 
-        <div class="card-header-actions">
+        <div class="card-header-actions flex-wrap gap-3">
             <div class="title-section">
                 <h2 class="page-title">Directorio de Alumnos</h2>
-                <p class="text-muted">Gestión escolar y matrículas</p>
+                <p class="text-muted mb-0">Gestión escolar y matrículas</p>
             </div>
 
-            <div class="buttons-section d-flex gap-2">
-                <button class="btn btn-outline-primary fw-bold" (click)="descargarTodosLosCarnets()"
+            <div class="buttons-section d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-primary fw-bold" (click)="descargarCarnets()"
                     [disabled]="generandoMasivo || alumnos.length === 0">
-
-                    <span *ngIf="!generandoMasivo">
-                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Descargar Carnets
-                    </span>
-
-                    <span *ngIf="generandoMasivo">
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        {{ progresoMasivo }}
-                    </span>
+                    <span *ngIf="!generandoMasivo"><i class="bi bi-file-earmark-pdf-fill me-2"></i> Descargar
+                        Carnets</span>
+                    <span *ngIf="generandoMasivo"><span class="spinner-border spinner-border-sm me-2"></span> {{
+                        progresoMasivo }}</span>
                 </button>
 
-                <a routerLink="/alumnos/nuevo" class="btn-academic btn-create">
+                <a routerLink="/alumnos/nuevo" class="btn-academic btn-create ms-2">
                     <i class="bi bi-person-plus-fill"></i> Nuevo Alumno
                 </a>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table custom-table align-middle">
+        <div
+            class="search-section p-3 border-bottom bg-light d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="input-group" style="max-width: 500px;">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0 ps-0"
+                    placeholder="Buscar por DNI, Nombres o Apellidos..." [(ngModel)]="terminoBusqueda"
+                    (keyup.enter)="buscarAlumnos()">
+
+                <button class="btn btn-primary" type="button" (click)="buscarAlumnos()" [disabled]="cargando">
+                    Buscar
+                </button>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <button *ngIf="busquedaRealizada" class="btn btn-outline-secondary btn-sm" (click)="limpiarBusqueda()"
+                    [disabled]="cargando">
+                    <i class="bi bi-x-circle"></i> Limpiar Filtro
+                </button>
+                <div *ngIf="cargando" class="spinner-border text-primary spinner-border-sm" role="status"></div>
+            </div>
+        </div>
+
+        <div class="table-responsive position-relative">
+
+            <div *ngIf="cargando" class="loading-overlay">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+            </div>
+
+            <table class="table custom-table align-middle" *ngIf="alumnos.length > 0">
                 <thead>
                     <tr>
                         <th scope="col" class="ps-4" style="width: 60px;">#</th>
@@ -77,17 +101,14 @@
 
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end gap-2">
-
                                 <button type="button" (click)="verCarnet(alumno)" class="btn-icon btn-carnet"
                                     title="Ver Carnet QR">
                                     <i class="bi bi-qr-code"></i>
                                 </button>
-
                                 <a [routerLink]="['/alumnos/editar', alumno.id]" class="btn-icon btn-edit"
                                     title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-
                                 <button type="button" (click)="eliminarAlumno(alumno.id!)" class="btn-icon btn-delete"
                                     title="Eliminar">
                                     <i class="bi bi-trash"></i>
@@ -98,9 +119,12 @@
                 </tbody>
             </table>
 
-            <div *ngIf="alumnos.length === 0" class="text-center py-5">
-                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-2">No hay alumnos registrados aún.</p>
+            <div *ngIf="alumnos.length === 0 && !cargando" class="text-center py-5">
+                <i class="bi bi-search text-muted" style="font-size: 3rem;" *ngIf="busquedaRealizada"></i>
+                <i class="bi bi-people text-muted" style="font-size: 3rem;" *ngIf="!busquedaRealizada"></i>
+                <p class="text-muted mt-2 fw-bold fs-5">
+                    {{ busquedaRealizada ? 'No se encontraron resultados.' : 'No hay alumnos registrados aún.' }}
+                </p>
             </div>
         </div>
 
@@ -143,9 +167,7 @@
 
 <div id="contenedor-carnets-masivos"
     style="position: fixed; left: -9999px; top: 0; width: 350px; height: 0; overflow: hidden;">
-
     <div *ngFor="let alumno of alumnos" style="margin-bottom: 20px;">
         <app-carnet-digital [alumno]="alumno" [ocultarAcciones]="true"></app-carnet-digital>
     </div>
-
 </div>

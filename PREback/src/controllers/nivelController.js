@@ -48,7 +48,7 @@ const crearNivel = async (req, res) => {
 
 const obtenerNiveles = async (req, res) => {
     try {
-        const [niveles] = await db.query('SELECT * FROM niveles WHERE estado = 1 ORDER BY id DESC');
+        const [niveles] = await db.query('SELECT * FROM niveles WHERE estado = 1 ORDER BY id ASC');
         res.json({
             success: true,
             count: niveles.length,

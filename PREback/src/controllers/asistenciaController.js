@@ -53,10 +53,10 @@ const registrarAsistencia = async (req, res) => {
             // Verificamos si es Sábado (6)
             if (diaSemana === 6) {
                 // Sábado: Límite 7:30 AM
-                horaLimite.setHours(7, 30, 0);
+                horaLimite.setHours(7, 10, 0);
             } else {
                 // Lunes a Viernes: Límite 7:02 AM
-                horaLimite.setHours(7, 2, 0);
+                horaLimite.setHours(7, 10, 0);
             }
         } else {
             // Horario Tarde: Límite 4:10 PM (16:10)

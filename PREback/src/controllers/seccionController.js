@@ -58,7 +58,7 @@ const obtenerSeccion = async (req, res) => {
             FROM secciones s
             INNER JOIN niveles n ON s.nivel_id = n.id
             WHERE s.estado = 1 
-            ORDER BY s.id DESC
+            ORDER BY s.id ASC
         `;
 
         const [secciones] = await db.query(query);

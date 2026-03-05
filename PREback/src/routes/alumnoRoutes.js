@@ -5,6 +5,8 @@ const {
     crearAlumno,
     obtenerAlumnos,
     obtenerAlumnoPorId,
+    buscarAlumnoPorDni,
+    buscarAlumnosPorNombreApellido,
     modificarAlumno,
     eliminarAlumno
 } = require('../controllers/alumnoController');
@@ -76,8 +78,9 @@ router.post('/', crearAlumno);
  *         description: Lista de alumnos
  */
 router.get('/', obtenerAlumnos);
+router.get('/buscar/dni/:dni', buscarAlumnoPorDni);
+router.get('/buscar/nombre/:termino', buscarAlumnosPorNombreApellido);
 router.get('/:id', obtenerAlumnoPorId);
-
 /**
  * @swagger
  * /api/alumnos/{id}:

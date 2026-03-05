@@ -32,4 +32,12 @@ export class AlumnoService {
   modificarAlumno(id: number, alumno: Alumno): Observable<AlumnoResponse> {
     return this.http.put<AlumnoResponse>(`${this.apiUrl}/${id}`, alumno);
   }
+
+  buscarAlumnoPorDni(dni: string): Observable<AlumnoResponse> {
+    return this.http.get<AlumnoResponse>(`${this.apiUrl}/buscar/dni/${dni}`);
+  }
+
+  buscarAlumnosPorNombreApellido(termino: string): Observable<AlumnoResponse> {
+    return this.http.get<AlumnoResponse>(`${this.apiUrl}/buscar/nombre/${termino}`);
+  }
 }

@@ -59,7 +59,7 @@ const crearAlumno = async (req, res) => {
 
 const obtenerAlumnos = async (req, res) => {
     try {
-        const [alumnos] = await db.query('SELECT * FROM alumnos WHERE estado = 1 ORDER BY id DESC');
+        const [alumnos] = await db.query('SELECT * FROM alumnos WHERE estado = 1 ORDER BY id ASC');
         res.json({
             success: true,
             count: alumnos.length,
@@ -97,6 +97,56 @@ const obtenerAlumnoPorId = async (req, res) => {
         res.status(500).json({
             success: false,
             mensaje: 'Error al obtener el alumno por id',
+            error: error.message
+        });
+    }
+};
+
+const buscarAlumnoPorDni = async (req, res) => {
+    try {
+        const { dni } = req.params;
+        const [alumno] = await db.query(
+            'SELECT * FROM alumnos WHERE dni_ce = ? AND estado = 1',
+            [dni]
+        );
+
+        res.json({
+            success: true,
+            count: alumno.length,
+            data: alumno
+        });
+
+    } catch (error) {
+        console.error('Error al buscar alumno por DNI:', error);
+        res.status(500).json({
+            success: false,
+            mensaje: 'Error al buscar el alumno por DNI',
+            error: error.message
+        });
+    }
+};
+
+const buscarAlumnosPorNombreApellido = async (req, res) => {
+    try {
+        const { termino } = req.params;
+        const searchPattern = `%${termino}%`;
+
+        const [alumnos] = await db.query(
+            'SELECT * FROM alumnos WHERE (nombres LIKE ? OR apellidos LIKE ?) AND estado = 1 ORDER BY apellidos ASC',
+            [searchPattern, searchPattern]
+        );
+
+        res.json({
+            success: true,
+            count: alumnos.length,
+            data: alumnos
+        });
+
+    } catch (error) {
+        console.error('Error al buscar alumnos por nombre o apellido:', error);
+        res.status(500).json({
+            success: false,
+            mensaje: 'Error al realizar la búsqueda',
             error: error.message
         });
     }
@@ -212,6 +262,8 @@ module.exports = {
     crearAlumno,
     obtenerAlumnos,
     obtenerAlumnoPorId,
+    buscarAlumnoPorDni,
+    buscarAlumnosPorNombreApellido,
     modificarAlumno,
     eliminarAlumno
 };
