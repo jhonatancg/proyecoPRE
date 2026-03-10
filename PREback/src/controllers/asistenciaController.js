@@ -1,5 +1,6 @@
+// Archivo: controllers/asistencia.controller.js
 const db = require('../config/database');
-const { enviarMensaje } = require('../services/whatsappService');
+const { agregarACola } = require('../services/whatsappQueue'); // Importamos la cola de mensajes
 
 const registrarAsistencia = async (req, res) => {
     try {
@@ -50,19 +51,14 @@ const registrarAsistencia = async (req, res) => {
         const diaSemana = ahora.getDay(); // 0 = Domingo, 6 = Sábado
 
         if (esTurnoManana) {
-            // Verificamos si es Sábado (6)
-            if (diaSemana === 6) {
-                // Sábado: Límite 7:30 AM
-                horaLimite.setHours(7, 10, 0);
+            if (diaSemana === 1) {
+                horaLimite.setHours(7, 6, 0); // Sábados límite 7:06
             } else {
-                // Lunes a Viernes: Límite 7:02 AM
-                horaLimite.setHours(7, 10, 0);
+                horaLimite.setHours(7, 10, 0); // Lunes a Viernes límite 7:10
             }
         } else {
-            // Horario Tarde: Límite 4:10 PM (16:10)
-            horaLimite.setHours(16, 10, 0);
+            horaLimite.setHours(16, 10, 0); // Turno tarde límite 16:10
         }
-        // ----------------------------------------------------
 
         const situacionFinal = (ahora > horaLimite) ? 'TARDE' : 'PUNTUAL';
 
@@ -74,13 +70,21 @@ const registrarAsistencia = async (req, res) => {
             [alumno_id, situacionFinal]
         );
 
+        // Envío a WhatsApp usando la Cola
         if (alumno.cel_apoderado) {
             const icono = situacionFinal === 'PUNTUAL' ? '✅' : '⚠️';
-            const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*`;
 
-            enviarMensaje(alumno.cel_apoderado, textoMensaje);
+            // Saludos aleatorios para que WhatsApp no detecte los mensajes como idénticos (Spintax)
+            const saludos = ["Hola", "Buen día", "Estimado apoderado", "Saludos", "Le informamos"];
+            const saludoAleatorio = saludos[Math.floor(Math.random() * saludos.length)];
+
+            const textoMensaje = `${saludoAleatorio}, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido al colegio.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*\n\nEste mensaje ha sido generado por un BOT de servicio, no responda a este número. Cualquier duda comuníquese con la auxiliar.`;
+
+            // Se envía a la cola segura
+            agregarACola(alumno.cel_apoderado, textoMensaje);
         }
 
+        // Respuesta inmediata al sistema web (No espera a que se envíe el WhatsApp)
         res.status(201).json({
             success: true,
             mensaje: `Asistencia Registrada: ${situacionFinal}`,
@@ -212,20 +216,16 @@ const justificarFalta = async (req, res) => {
             return res.status(400).json({ success: false, mensaje: "Faltan datos (alumno, fecha o situación)" });
         }
 
-        // Verificamos si ya existe registro ese día (para saber si es UPDATE o INSERT)
         const [existente] = await db.query(
             'SELECT id FROM asistencias WHERE alumno_id = ? AND fecha = ? AND estado = 1',
             [alumno_id, fecha]
         );
 
         if (existente.length > 0) {
-            // SI YA EXISTE (Ej: Llegó tarde y queremos justificarlo) -> ACTUALIZAMOS
             const idAsistencia = existente[0].id;
             await db.query('UPDATE asistencias SET situacion = ? WHERE id = ?', [situacion, idAsistencia]);
             res.json({ success: true, mensaje: "Asistencia actualizada correctamente." });
         } else {
-            // SI NO EXISTE (Tiene FALTA y queremos justificarla) -> CREAMOS EL REGISTRO
-            // Ponemos hora '00:00:00' para indicar que no marcó QR
             await db.query(
                 'INSERT INTO asistencias (alumno_id, fecha, hora_entrada, situacion, estado) VALUES (?, ?, "00:00:00", ?, 1)',
                 [alumno_id, fecha, situacion]
@@ -238,6 +238,7 @@ const justificarFalta = async (req, res) => {
         res.status(500).json({ success: false, mensaje: 'Error al procesar justificación', error: error.message });
     }
 };
+
 const eliminarAsistencia = async (req, res) => {
     try {
         const { id } = req.params;
@@ -262,7 +263,7 @@ const eliminarAsistencia = async (req, res) => {
 
 const reenviarNotificacionesHoy = async (req, res) => {
     try {
-        console.log('🔄 Iniciando reenvío masivo de notificaciones de HOY...');
+        console.log('🔄 Iniciando reenvío masivo a la cola de mensajes...');
 
         const [asistenciasHoy] = await db.query(`
             SELECT 
@@ -281,35 +282,27 @@ const reenviarNotificacionesHoy = async (req, res) => {
             return res.json({ success: true, mensaje: 'No hay asistencias registradas hoy para reenviar.' });
         }
 
-        let enviados = 0;
-        let errores = 0;
         const fechaLegible = new Date().toLocaleDateString('es-PE');
+        const saludos = ["Hola", "Buen día", "Estimado apoderado", "Saludos", "Le informamos"];
 
         for (const registro of asistenciasHoy) {
             if (registro.cel_apoderado) {
                 const icono = registro.situacion === 'PUNTUAL' ? '✅' : '⚠️';
                 const horaLegible = registro.hora_entrada;
+                const saludoAleatorio = saludos[Math.floor(Math.random() * saludos.length)];
 
-                const textoMensaje = `Hola, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido a la academia.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*\n\nEste mensaje ha sido generado por un BOT de servicio, no responda a este número, cualquier duda o consulta póngase en contacto con la auxiliar `;
-                console.log(`📤 Reenviando a: ${registro.nombres} (${registro.cel_apoderado})...`);
+                // Usamos registro.nombres y registro.apellidos
+                const textoMensaje = `${saludoAleatorio}, por problemas de red, recién se está enviando la notificación de asistencia. El alumno *${registro.nombres} ${registro.apellidos}* asistió con normalidad esta mañana.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
 
-                const exito = await enviarMensaje(registro.cel_apoderado, textoMensaje);
-
-                if (exito) enviados++;
-                else errores++;
-
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Se agrega a la cola y se procesará en segundo plano
+                agregarACola(registro.cel_apoderado, textoMensaje);
             }
         }
 
+        // Respuesta inmediata al navegador web
         res.json({
             success: true,
-            mensaje: `Proceso finalizado. Se intentó notificar a ${asistenciasHoy.length} alumnos.`,
-            detalles: {
-                total_registros_hoy: asistenciasHoy.length,
-                mensajes_enviados: enviados,
-                mensajes_fallidos: errores
-            }
+            mensaje: `Proceso en segundo plano iniciado. Se agregaron ${asistenciasHoy.length} mensajes a la cola de envío seguro.`,
         });
 
     } catch (error) {

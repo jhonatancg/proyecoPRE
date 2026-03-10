@@ -99,7 +99,7 @@ router.post('/', crearUsuario);
  *       200:
  *         description: Lista de usuarios
  */
-router.get('/', verificarToken, verificarAdmin, obtenerUsuario);
+router.get('/', obtenerUsuario);
 
 /**
  * @swagger
@@ -139,7 +139,7 @@ router.get('/', verificarToken, verificarAdmin, obtenerUsuario);
  *       404:
  *         description: Usuario no encontrado
  */
-router.put('/:id', verificarToken, verificarAdmin, modificarUsuario);
+router.put('/:id', modificarUsuario);
 
 /**
  * @swagger
@@ -162,6 +162,6 @@ router.put('/:id', verificarToken, verificarAdmin, modificarUsuario);
  *       404:
  *         description: Usuario no encontrado
  */
-router.delete('/:id', verificarToken, verificarAdmin, eliminarUsuario);
+router.delete('/:id', eliminarUsuario);
 
 module.exports = router;
