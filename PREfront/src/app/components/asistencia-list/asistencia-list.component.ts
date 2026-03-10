@@ -292,30 +292,63 @@ export class AsistenciaListComponent implements OnInit {
   exportarPDF() {
     if (this.asistencias.length === 0) return;
     const doc = new jsPDF();
-    doc.setFontSize(18); doc.text('Reporte de Asistencia', 14, 20);
-    doc.setFontSize(10); doc.text(`Fecha: ${this.fechaSeleccionada}`, 14, 30);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(13, 71, 161);
+    doc.text('Reporte de Asistencia', 14, 22);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Fecha: ${this.fechaSeleccionada}`, 14, 32);
+
     const seccion = this.seccionesFiltradas.find(s => s.id == this.seccionSeleccionada);
-    if (seccion) doc.text(`Aula: ${seccion.nombre}`, 14, 36);
+    if (seccion) doc.text(`Aula: ${seccion.nombre}`, 14, 38);
 
     const data = this.asistencias.map((item, i) => [
-      i + 1, `${item.apellidos}, ${item.nombres}`, item.dni_ce, item.hora_entrada, item.situacion
+      i + 1,
+      `${item.apellidos}, ${item.nombres}`,
+      item.hora_entrada,
+      item.situacion
     ]);
 
     autoTable(doc, {
-      startY: 45,
-      head: [['#', 'Alumno', 'DNI', 'Hora', 'Estado']],
+      startY: 46,
+      head: [['#', 'Alumno', 'Hora', 'Estado']],
       body: data,
-      theme: 'grid',
-      headStyles: { fillColor: [13, 71, 161] },
+      theme: 'striped',
+      styles: {
+        font: 'helvetica',
+        fontSize: 10,
+        cellPadding: 5,
+        textColor: [60, 60, 60]
+      },
+      headStyles: {
+        fillColor: [13, 71, 161],
+        textColor: 255,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 15 },
+        2: { halign: 'center', cellWidth: 35 },
+        3: { halign: 'center', cellWidth: 35, fontStyle: 'bold' }
+      },
       didParseCell: (d) => {
-        if (d.section === 'body' && d.column.index === 4) {
-          const est = String(d.cell.raw);
-          if (est.includes('FALTA')) d.cell.styles.textColor = [220, 53, 69];
-          else if (est.includes('TARDE')) d.cell.styles.textColor = [255, 193, 7];
-          else d.cell.styles.textColor = [25, 135, 84];
+        if (d.section === 'body' && d.column.index === 3) {
+          const est = String(d.cell.raw).toUpperCase();
+          if (est.includes('FALTA')) {
+            d.cell.styles.textColor = [220, 53, 69];
+          } else if (est.includes('TARDE')) {
+            d.cell.styles.textColor = [230, 138, 0];
+          } else {
+            d.cell.styles.textColor = [25, 135, 84];
+          }
         }
       }
     });
+
     doc.save(`asistencia_${this.fechaSeleccionada}.pdf`);
   }
 }
