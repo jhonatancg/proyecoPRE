@@ -1,4 +1,3 @@
-// Archivo: controllers/asistencia.controller.js
 const db = require('../config/database');
 const { agregarACola } = require('../services/whatsappQueue'); // Importamos la cola de mensajes
 
@@ -74,17 +73,22 @@ const registrarAsistencia = async (req, res) => {
         if (alumno.cel_apoderado) {
             const icono = situacionFinal === 'PUNTUAL' ? '✅' : '⚠️';
 
-            // Saludos aleatorios para que WhatsApp no detecte los mensajes como idénticos (Spintax)
-            const saludos = ["Hola", "Buen día", "Estimado apoderado", "Saludos", "Le informamos"];
+            // 🚨 AMPLIACIÓN DE SALUDOS PARA EVITAR SPAM
+            const saludos = [
+                "Hola", "Buen día", "Estimado(a)", "Saludos",
+                , "Buenos días", "Muy buen día",
+                "Buenas"
+            ];
             const saludoAleatorio = saludos[Math.floor(Math.random() * saludos.length)];
 
-            const textoMensaje = `${saludoAleatorio}, informamos que el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido al colegio.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*\n\nEste mensaje ha sido generado por un BOT de servicio, no responda a este número. Cualquier duda comuníquese con la auxiliar.`;
+            // 🚨 ELIMINADA LA PALABRA "BOT" - TEXTO MÁS HUMANO
+            const textoMensaje = `${saludoAleatorio}, el alumno *${alumno.nombres} ${alumno.apellidos}* ha asistido al colegio.\n\n📅 Fecha: ${fechaRegistro}\n⏰ Hora: ${horaRegistro}\n${icono} Estado: *${situacionFinal}*\n\nAtentamente, Auxiliar del Colegio. Por favor, no responda a este mensaje.`;
 
             // Se envía a la cola segura
             agregarACola(alumno.cel_apoderado, textoMensaje);
         }
 
-        // Respuesta inmediata al sistema web (No espera a que se envíe el WhatsApp)
+        // Respuesta inmediata al sistema web
         res.status(201).json({
             success: true,
             mensaje: `Asistencia Registrada: ${situacionFinal}`,
@@ -283,7 +287,13 @@ const reenviarNotificacionesHoy = async (req, res) => {
         }
 
         const fechaLegible = new Date().toLocaleDateString('es-PE');
-        const saludos = ["Hola", "Buen día", "Estimado apoderado", "Saludos", "Le informamos"];
+
+        // 🚨 AMPLIACIÓN DE SALUDOS
+        const saludos = [
+            "Hola", "Buen día", "Estimado(a)", "Saludos",
+            , "Buenos días", "Muy buen día",
+            "Buenas"
+        ];
 
         for (const registro of asistenciasHoy) {
             if (registro.cel_apoderado) {
@@ -291,8 +301,8 @@ const reenviarNotificacionesHoy = async (req, res) => {
                 const horaLegible = registro.hora_entrada;
                 const saludoAleatorio = saludos[Math.floor(Math.random() * saludos.length)];
 
-                // Usamos registro.nombres y registro.apellidos
-                const textoMensaje = `${saludoAleatorio}, por problemas de red, recién se está enviando la notificación de asistencia. El alumno *${registro.nombres} ${registro.apellidos}* asistió con normalidad esta mañana.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*`;
+                // 🚨 TEXTO MÁS HUMANO
+                const textoMensaje = `${saludoAleatorio}, por problemas de red recién se envía la notificación. El alumno *${registro.nombres} ${registro.apellidos}* asistió con normalidad.\n\n📅 Fecha: ${fechaLegible}\n⏰ Hora: ${horaLegible}\n${icono} Estado: *${registro.situacion}*\n\nAtentamente, Auxiliar del Colegio.`;
 
                 // Se agrega a la cola y se procesará en segundo plano
                 agregarACola(registro.cel_apoderado, textoMensaje);

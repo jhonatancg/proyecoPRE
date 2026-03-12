@@ -8,7 +8,6 @@ import { AlumnoService } from '../../services/alumno.service';
 import { AuthService } from '../../services/auth.service';
 import { MatriculaService } from '../../services/matricula.service';
 
-// Solo importamos el carnet original (pequeño)
 import { CarnetDigitalComponent } from '../carnet-digital/carnet-digital.component';
 
 import jsPDF from 'jspdf';
@@ -22,7 +21,7 @@ import html2canvas from 'html2canvas';
   styleUrl: './alumno-list.component.css'
 })
 export class AlumnoListComponent implements OnInit {
-  alumnos: Alumno[] = [];
+  alumnos: any[] = [];
   error: string = '';
   cargando: boolean = false;
 
@@ -30,11 +29,14 @@ export class AlumnoListComponent implements OnInit {
   terminoBusqueda: string = '';
   busquedaRealizada: boolean = false;
 
-  alumnoSeleccionadoCarnet: Alumno | null = null;
+  alumnoSeleccionadoCarnet: any | null = null;
 
   // --- VARIABLES DE DESCARGA MASIVA ---
-  generandoMasivo: boolean = false; // Renombrado a uno solo
+  generandoMasivo: boolean = false;
   progresoMasivo: string = '';
+
+  // --- CONTADOR POR PERIODO ---
+  resumenPeriodos: { nombre: string, cantidad: number }[] = [];
 
   // --- VARIABLES DE PAGINACIÓN ---
   currentPage: number = 1;
@@ -95,7 +97,7 @@ export class AlumnoListComponent implements OnInit {
   }
 
   private procesarRespuestaAlumnos(resAlumnos: any): void {
-    let listaAlumnos: Alumno[] = [];
+    let listaAlumnos: any[] = [];
 
     if (resAlumnos.success && Array.isArray(resAlumnos.data)) {
       listaAlumnos = resAlumnos.data;
@@ -105,6 +107,7 @@ export class AlumnoListComponent implements OnInit {
 
     if (listaAlumnos.length === 0) {
       this.alumnos = [];
+      this.resumenPeriodos = [];
       this.cargando = false;
       this.currentPage = 1;
       return;
@@ -120,16 +123,43 @@ export class AlumnoListComponent implements OnInit {
           listaMatriculas = resMatriculas;
         }
 
+        const conteoMap = new Map<string, number>();
+
+        // ========================================================
+        // CRUCE MÚLTIPLE DE MATRÍCULAS Y CONTEO
+        // ========================================================
         listaAlumnos.forEach(alumno => {
-          const matricula = listaMatriculas.find(m => Number(m.alumno_id) === Number(alumno.id));
-          if (matricula) {
-            alumno.nivel = matricula.nivel || matricula.grado || 'PRE';
-            alumno.seccion = matricula.seccion || 'A';
+          const matriculasDelAlumno = listaMatriculas.filter(m => Number(m.alumno_id) === Number(alumno.id));
+
+          if (matriculasDelAlumno.length > 0) {
+            const periodos = matriculasDelAlumno
+              .map(m => m.periodo || m.nombre_periodo || m.periodo_nombre || `P-${m.periodo_id || 'X'}`)
+              .filter((value, index, self) => self.indexOf(value) === index);
+
+            periodos.forEach(p => {
+              conteoMap.set(p, (conteoMap.get(p) || 0) + 1);
+            });
+
+            alumno.periodosTexto = periodos.join(', ');
+
+            const nivelesSecciones = matriculasDelAlumno
+              .map(m => `${m.nivel || m.grado || 'PRE'} - ${m.seccion || 'A'}`)
+              .filter((value, index, self) => self.indexOf(value) === index);
+
+            alumno.nivelSeccionTexto = nivelesSecciones.join(' | ');
+
+            // Para el carnet digital
+            alumno.nivel = matriculasDelAlumno[0].nivel || matriculasDelAlumno[0].grado || 'PRE';
+            alumno.seccion = matriculasDelAlumno[0].seccion || 'A';
           } else {
+            alumno.periodosTexto = 'Sin matrícula';
+            alumno.nivelSeccionTexto = 'Sin asignar';
             alumno.nivel = 'No Matriculado';
             alumno.seccion = 'Sin Asignar';
           }
         });
+
+        this.resumenPeriodos = Array.from(conteoMap, ([nombre, cantidad]) => ({ nombre, cantidad }));
 
         this.alumnos = listaAlumnos;
         this.currentPage = 1;
@@ -137,6 +167,11 @@ export class AlumnoListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar matrículas', err);
+        listaAlumnos.forEach(a => {
+          a.periodosTexto = 'Error carga';
+          a.nivelSeccionTexto = 'Error carga';
+        });
+        this.resumenPeriodos = [];
         this.alumnos = listaAlumnos;
         this.currentPage = 1;
         this.cargando = false;
@@ -148,11 +183,12 @@ export class AlumnoListComponent implements OnInit {
     console.error('Error en la petición:', err);
     this.error = 'Ocurrió un error al consultar los datos.';
     this.alumnos = [];
+    this.resumenPeriodos = [];
     this.cargando = false;
   }
 
   // --- MÉTODOS DE PAGINACIÓN ---
-  get paginatedAlumnos(): Alumno[] {
+  get paginatedAlumnos(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.alumnos.slice(startIndex, endIndex);
@@ -191,7 +227,7 @@ export class AlumnoListComponent implements OnInit {
     }
   }
 
-  verCarnet(alumno: Alumno) {
+  verCarnet(alumno: any) {
     this.alumnoSeleccionadoCarnet = alumno;
   }
 
@@ -235,9 +271,6 @@ export class AlumnoListComponent implements OnInit {
     this.generandoMasivo = false;
   }
 
-  // ==============================================================
-  // FUNCIÓN REUTILIZABLE PARA GENERAR EL PDF
-  // ==============================================================
   private async procesarPDF(pdf: jsPDF, container: HTMLElement, posiciones: number[][],
     cardWidth: number, cardHeight: number, limitPerPage: number, filename: string) {
 

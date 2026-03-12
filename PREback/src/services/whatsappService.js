@@ -16,7 +16,6 @@ const client = new Client({
 
 // 1. Generación de QR
 client.on('qr', (qr) => {
-    // Si pide QR, reseteamos la bandera por si acaso
     yaMostroMensaje = false;
     console.log('------------------------------------------------');
     console.log('ESCANEA ESTE QR CON TU WHATSAPP (Dispositivos Vinculados):');
@@ -24,15 +23,15 @@ client.on('qr', (qr) => {
     console.log('------------------------------------------------');
 });
 
-// 2. Confirmación de Autenticación (CON FILTRO ANTI-REPETICIÓN)
+// 2. Confirmación de Autenticación
 client.on('authenticated', () => {
     if (!yaMostroMensaje) {
         console.log('✅ QR Escaneado correctamente. Autenticación exitosa.');
-        yaMostroMensaje = true; // Marcamos como mostrado
+        yaMostroMensaje = true;
     }
 });
 
-// 3. Pantalla de carga (Bajando mensajes, contactos, etc.)
+// 3. Pantalla de carga
 client.on('loading_screen', (porcentaje, mensaje) => {
     console.log(`⏳ Cargando WhatsApp: ${porcentaje}% - ${mensaje}`);
 });
@@ -49,8 +48,11 @@ client.on('auth_failure', msg => {
 
 client.on('disconnected', (reason) => {
     console.log('⚠️ WhatsApp se desconectó. Razón:', reason);
-    yaMostroMensaje = false; // Reseteamos la bandera para cuando se reconecte
+    yaMostroMensaje = false;
 });
+
+// Función para pausar (Delay)
+const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Función para enviar mensaje
 const enviarMensaje = async (numero, texto) => {
@@ -61,13 +63,21 @@ const enviarMensaje = async (numero, texto) => {
         const numeroLimpio = numero.replace(/\D/g, '');
         const chatId = `51${numeroLimpio}@c.us`;
 
+        // 🚨 SIMULACIÓN DE HUMANO: "Escribiendo..."
+        const chat = await client.getChatById(chatId);
+        await chat.sendStateTyping(); // Aparece "Escribiendo..." en el cel del padre
+
+        // Espera aleatoria entre 3 y 5 segundos mientras "escribe"
+        const tiempoEscritura = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
+        await esperar(tiempoEscritura);
+
         // Intentamos enviar
         await client.sendMessage(chatId, texto);
         console.log(`📩 Mensaje enviado a ${numeroLimpio}`);
         return true;
 
     } catch (error) {
-        console.error('Error enviando WhatsApp:', error);
+        console.error(`Error enviando WhatsApp a ${numero}:`, error.message);
         return false;
     }
 };

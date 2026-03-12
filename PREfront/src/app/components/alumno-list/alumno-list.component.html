@@ -24,22 +24,32 @@
 
         <div
             class="search-section p-3 border-bottom bg-light d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="input-group" style="max-width: 500px;">
+
+            <div class="input-group" style="max-width: 400px;">
                 <span class="input-group-text bg-white border-end-0">
                     <i class="bi bi-search text-muted"></i>
                 </span>
-                <input type="text" class="form-control border-start-0 ps-0"
-                    placeholder="Buscar por DNI, Nombres o Apellidos..." [(ngModel)]="terminoBusqueda"
-                    (keyup.enter)="buscarAlumnos()">
+
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar DNI, Nombres..."
+                    [(ngModel)]="terminoBusqueda" (keyup.enter)="buscarAlumnos()" />
 
                 <button class="btn btn-primary" type="button" (click)="buscarAlumnos()" [disabled]="cargando">
                     Buscar
                 </button>
             </div>
 
-            <div class="d-flex align-items-center gap-3">
-                <button *ngIf="busquedaRealizada" class="btn btn-outline-secondary btn-sm" (click)="limpiarBusqueda()"
-                    [disabled]="cargando">
+            <div class="d-flex flex-wrap gap-2 flex-grow-1 mx-2">
+                <span
+                    class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2 rounded-pill shadow-sm d-flex align-items-center"
+                    *ngFor="let periodo of resumenPeriodos">
+                    <i class="bi bi-calendar-check me-2"></i> {{ periodo.nombre }}:
+                    <span class="fw-bold fs-6 ms-1">{{ periodo.cantidad }}</span>
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <button *ngIf="busquedaRealizada" class="btn btn-outline-secondary btn-sm text-nowrap"
+                    (click)="limpiarBusqueda()" [disabled]="cargando">
                     <i class="bi bi-x-circle"></i> Limpiar Filtro
                 </button>
                 <div *ngIf="cargando" class="spinner-border text-primary spinner-border-sm" role="status"></div>
@@ -59,6 +69,8 @@
                         <th scope="col">Estudiante</th>
                         <th scope="col">Documento</th>
                         <th scope="col">Apoderado</th>
+                        <th scope="col">Periodos</th>
+                        <th scope="col">Nivel / Sección</th>
                         <th scope="col" class="text-end pe-4">Acciones</th>
                     </tr>
                 </thead>
@@ -96,6 +108,18 @@
                             </div>
                             <div class="small text-muted" *ngIf="alumno.cel_apoderado">
                                 <i class="bi bi-phone"></i> {{ alumno.cel_apoderado }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-info text-dark bg-opacity-10 border border-info">
+                                {{ alumno.periodosTexto }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="small fw-bold text-secondary">
+                                {{ alumno.nivelSeccionTexto }}
                             </div>
                         </td>
 

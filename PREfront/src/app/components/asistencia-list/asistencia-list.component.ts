@@ -320,8 +320,8 @@ export class AsistenciaListComponent implements OnInit {
       theme: 'striped',
       styles: {
         font: 'helvetica',
-        fontSize: 10,
-        cellPadding: 5,
+        fontSize: 9,
+        cellPadding: 2,
         textColor: [60, 60, 60]
       },
       headStyles: {

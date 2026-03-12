@@ -16,17 +16,17 @@ const procesarCola = async () => {
     while (colaMensajes.length > 0) {
 
         // ------------------------------------------------------------------------
-        // REGLA 1: ESPERAR HASTA LAS 7:00 AM PARA EMPEZAR A ENVIAR
+        // REGLA 1: ESPERAR HASTA LAS 8:00 AM PARA EMPEZAR A ENVIAR
         // ------------------------------------------------------------------------
         const ahora = new Date();
-        if (ahora.getHours() < 7) {
-            const sieteAM = new Date();
-            sieteAM.setHours(7, 0, 0, 0); // Configuramos el reloj a las 07:00:00 de hoy
-            const msFaltantes = sieteAM.getTime() - ahora.getTime();
+        if (ahora.getHours() < 8) {
+            const ochoAM = new Date();
+            ochoAM.setHours(8, 0, 0, 0); // Configuramos el reloj a las 08:00:00 de hoy
+            const msFaltantes = ochoAM.getTime() - ahora.getTime();
 
-            console.log(`[WhatsApp Queue] Es muy temprano. Pausando envíos por ${Math.round(msFaltantes / 60000)} minutos hasta las 7:00 AM...`);
+            console.log(`[WhatsApp Queue] Es muy temprano. Pausando envíos por ${Math.round(msFaltantes / 60000)} minutos hasta las 8:00 AM...`);
             await esperar(msFaltantes);
-            console.log(`[WhatsApp Queue] ¡Son las 7:00 AM! Despertando motor de envíos...`);
+            console.log(`[WhatsApp Queue] ¡Son las 8:00 AM! Despertando motor de envíos...`);
         }
         // ------------------------------------------------------------------------
 
